@@ -1,0 +1,25 @@
+var fs = require('fs'); 
+var path = require('path'); 
+
+function filter (dir, givenExt, callback) {
+    
+    fs.readdir(dir, function(err, list) { 
+	    if (err) {
+		callback(err);  
+	    }
+	    var givenExt = '.' + givenExt; 
+	    var filteredList = [];
+	    var i = 0; 
+	    list.forEach(function (val, index, array) {
+		    var ext = path.extname(val); 
+		    //console.log(ext); 
+		    if (ext == givenExt) { 
+			filteredList[i] = val; 
+			i++; 
+			//console.log(val); 
+		    }
+		}); 
+	    callback(null, filteredList);  
+	}); 
+    
+

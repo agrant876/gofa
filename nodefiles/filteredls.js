@@ -1,0 +1,26 @@
+var fs = require('fs');
+var path = require('path');
+
+/*
+process.argv.forEach(function(val, index, array) { 
+	console.log(index + ': ' + val); 
+    }); 
+*/ 
+
+var givenExt = '.' + process.argv[3]; 
+//console.log(givenExt); 
+
+
+
+
+fs.readdir(process.argv[2], function(err, list) { 
+	if (err) console.log(err); 
+	list.forEach(function (val, index, array) {
+		var ext = path.extname(val); 
+		//console.log(ext); 
+		if (ext == givenExt) { 
+		    console.log(val); 
+		}
+	    }); 
+    }); 
+

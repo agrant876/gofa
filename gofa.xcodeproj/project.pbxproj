@@ -1,0 +1,550 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AD037D611A90984000DA4BA0 /* Bag.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD037D601A90984000DA4BA0 /* Bag.swift */; };
+		AD037D631A90986F00DA4BA0 /* BagViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD037D621A90986F00DA4BA0 /* BagViewController.swift */; };
+		AD1589D11A7E989700DBC68A /* OBShapedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1589D01A7E989700DBC68A /* OBShapedButton.m */; };
+		AD1589D41A7E98AE00DBC68A /* UIImage+ColorAtPixel.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1589D31A7E98AE00DBC68A /* UIImage+ColorAtPixel.m */; };
+		AD1589D61A7E9EA200DBC68A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD1589D51A7E9EA100DBC68A /* CoreGraphics.framework */; };
+		AD1A6DEE1A79D6CF009B9F31 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1A6DED1A79D6CF009B9F31 /* AppDelegate.swift */; };
+		AD1A6DF31A79D6CF009B9F31 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AD1A6DF11A79D6CF009B9F31 /* Main.storyboard */; };
+		AD1A6DF81A79D6CF009B9F31 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD1A6DF61A79D6CF009B9F31 /* LaunchScreen.xib */; };
+		AD1A6E041A79D6CF009B9F31 /* gofaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1A6E031A79D6CF009B9F31 /* gofaTests.swift */; };
+		AD1A6E0E1A79EC0F009B9F31 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AD1A6E0D1A79EC0F009B9F31 /* Images.xcassets */; };
+		AD1A6E101A7A015E009B9F31 /* Firebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD1A6E0F1A7A015E009B9F31 /* Firebase.framework */; };
+		AD1A6E121A7A0207009B9F31 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AD1A6E111A7A0207009B9F31 /* libicucore.dylib */; };
+		AD1A6E141A7A0216009B9F31 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AD1A6E131A7A0216009B9F31 /* libc++.dylib */; };
+		AD1A6E161A7A021D009B9F31 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD1A6E151A7A021D009B9F31 /* CFNetwork.framework */; };
+		AD1A6E181A7A0225009B9F31 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD1A6E171A7A0225009B9F31 /* Security.framework */; };
+		AD1A6E1A1A7A0232009B9F31 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD1A6E191A7A0232009B9F31 /* SystemConfiguration.framework */; };
+		AD1A6E3D1A7B402C009B9F31 /* VenmoAppSwitch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD1A6E3C1A7B402C009B9F31 /* VenmoAppSwitch.framework */; };
+		AD1A6E3F1A7B4074009B9F31 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD1A6E3E1A7B4074009B9F31 /* Foundation.framework */; };
+		AD1A6E411A7B407E009B9F31 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD1A6E401A7B407E009B9F31 /* UIKit.framework */; };
+		AD27BC571A85950800C02E81 /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD27BC561A85950800C02E81 /* LocationViewController.swift */; };
+		AD2AADAC1A814AFB00FFA416 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2AADAB1A814AFB00FFA416 /* Trip.swift */; };
+		AD2AADAE1A8155D700FFA416 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2AADAD1A8155D700FFA416 /* Location.swift */; };
+		AD2AADB41A817A3200FFA416 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2AADB31A817A3200FFA416 /* Transaction.swift */; };
+		AD4996A71AA8602600C1BE25 /* TripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4996A61AA8602600C1BE25 /* TripViewController.swift */; };
+		AD7D8ECD1A81837F008E400D /* UserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7D8ECC1A81837F008E400D /* UserViewController.swift */; };
+		ADC1BAA41A7C472900235B09 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC1BAA31A7C472900235B09 /* LoginViewController.swift */; };
+		ADC1BAA81A7C498D00235B09 /* SignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC1BAA71A7C498D00235B09 /* SignupViewController.swift */; };
+		ADD823691AA7023D009057FB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD823681AA7023D009057FB /* ViewController.swift */; };
+		ADE13BBE1A82B86E004717B6 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE13BBD1A82B86E004717B6 /* User.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AD1A6DFE1A79D6CF009B9F31 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AD1A6DE01A79D6CF009B9F31 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AD1A6DE71A79D6CF009B9F31;
+			remoteInfo = gofa;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		AD037D601A90984000DA4BA0 /* Bag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bag.swift; sourceTree = "<group>"; };
+		AD037D621A90986F00DA4BA0 /* BagViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BagViewController.swift; sourceTree = "<group>"; };
+		AD1589CF1A7E989700DBC68A /* OBShapedButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OBShapedButton.h; path = "../../../Desktop/OBShapedButton-master/OBShapedButton/OBShapedButton.h"; sourceTree = "<group>"; };
+		AD1589D01A7E989700DBC68A /* OBShapedButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OBShapedButton.m; path = "../../../Desktop/OBShapedButton-master/OBShapedButton/OBShapedButton.m"; sourceTree = "<group>"; };
+		AD1589D21A7E98AE00DBC68A /* UIImage+ColorAtPixel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+ColorAtPixel.h"; path = "../../../Desktop/OBShapedButton-master/UIImage+ColorAtPixel/UIImage+ColorAtPixel.h"; sourceTree = "<group>"; };
+		AD1589D31A7E98AE00DBC68A /* UIImage+ColorAtPixel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+ColorAtPixel.m"; path = "../../../Desktop/OBShapedButton-master/UIImage+ColorAtPixel/UIImage+ColorAtPixel.m"; sourceTree = "<group>"; };
+		AD1589D51A7E9EA100DBC68A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		AD1A6DE81A79D6CF009B9F31 /* gofa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gofa.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AD1A6DEC1A79D6CF009B9F31 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AD1A6DED1A79D6CF009B9F31 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		AD1A6DF21A79D6CF009B9F31 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		AD1A6DF71A79D6CF009B9F31 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		AD1A6DFD1A79D6CF009B9F31 /* gofaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = gofaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AD1A6E021A79D6CF009B9F31 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AD1A6E031A79D6CF009B9F31 /* gofaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gofaTests.swift; sourceTree = "<group>"; };
+		AD1A6E0D1A79EC0F009B9F31 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		AD1A6E0F1A7A015E009B9F31 /* Firebase.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Firebase.framework; path = gofa/Firebase.framework; sourceTree = "<group>"; };
+		AD1A6E111A7A0207009B9F31 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
+		AD1A6E131A7A0216009B9F31 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		AD1A6E151A7A021D009B9F31 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		AD1A6E171A7A0225009B9F31 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		AD1A6E191A7A0232009B9F31 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		AD1A6E351A7A03B7009B9F31 /* gofa-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gofa-Bridging-Header.h"; sourceTree = "<group>"; };
+		AD1A6E3C1A7B402C009B9F31 /* VenmoAppSwitch.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VenmoAppSwitch.framework; path = "app-switch-ios-framework-master/VenmoAppSwitch.framework"; sourceTree = "<group>"; };
+		AD1A6E3E1A7B4074009B9F31 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		AD1A6E401A7B407E009B9F31 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		AD27BC561A85950800C02E81 /* LocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
+		AD2AADAB1A814AFB00FFA416 /* Trip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
+		AD2AADAD1A8155D700FFA416 /* Location.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		AD2AADB31A817A3200FFA416 /* Transaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Transaction.swift; path = ../Transaction.swift; sourceTree = "<group>"; };
+		AD4996A61AA8602600C1BE25 /* TripViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TripViewController.swift; path = ../TripViewController.swift; sourceTree = "<group>"; };
+		AD7D8ECC1A81837F008E400D /* UserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserViewController.swift; path = ../UserViewController.swift; sourceTree = "<group>"; };
+		ADC1BAA31A7C472900235B09 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		ADC1BAA71A7C498D00235B09 /* SignupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SignupViewController.swift; path = ../SignupViewController.swift; sourceTree = "<group>"; };
+		ADD823681AA7023D009057FB /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		ADE13BBD1A82B86E004717B6 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AD1A6DE51A79D6CF009B9F31 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD1589D61A7E9EA200DBC68A /* CoreGraphics.framework in Frameworks */,
+				AD1A6E411A7B407E009B9F31 /* UIKit.framework in Frameworks */,
+				AD1A6E3F1A7B4074009B9F31 /* Foundation.framework in Frameworks */,
+				AD1A6E1A1A7A0232009B9F31 /* SystemConfiguration.framework in Frameworks */,
+				AD1A6E181A7A0225009B9F31 /* Security.framework in Frameworks */,
+				AD1A6E161A7A021D009B9F31 /* CFNetwork.framework in Frameworks */,
+				AD1A6E141A7A0216009B9F31 /* libc++.dylib in Frameworks */,
+				AD1A6E3D1A7B402C009B9F31 /* VenmoAppSwitch.framework in Frameworks */,
+				AD1A6E121A7A0207009B9F31 /* libicucore.dylib in Frameworks */,
+				AD1A6E101A7A015E009B9F31 /* Firebase.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AD1A6DFA1A79D6CF009B9F31 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AD1A6DDF1A79D6CF009B9F31 = {
+			isa = PBXGroup;
+			children = (
+				AD1589D51A7E9EA100DBC68A /* CoreGraphics.framework */,
+				AD1A6E401A7B407E009B9F31 /* UIKit.framework */,
+				AD1A6E3E1A7B4074009B9F31 /* Foundation.framework */,
+				AD1A6E191A7A0232009B9F31 /* SystemConfiguration.framework */,
+				AD1A6E171A7A0225009B9F31 /* Security.framework */,
+				AD1A6E151A7A021D009B9F31 /* CFNetwork.framework */,
+				AD1A6E131A7A0216009B9F31 /* libc++.dylib */,
+				AD1A6E111A7A0207009B9F31 /* libicucore.dylib */,
+				AD1A6DEA1A79D6CF009B9F31 /* gofa */,
+				AD1A6E001A79D6CF009B9F31 /* gofaTests */,
+				AD1A6DE91A79D6CF009B9F31 /* Products */,
+				AD1A6E0F1A7A015E009B9F31 /* Firebase.framework */,
+				AD1A6E351A7A03B7009B9F31 /* gofa-Bridging-Header.h */,
+				AD1A6E3C1A7B402C009B9F31 /* VenmoAppSwitch.framework */,
+			);
+			sourceTree = "<group>";
+		};
+		AD1A6DE91A79D6CF009B9F31 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AD1A6DE81A79D6CF009B9F31 /* gofa.app */,
+				AD1A6DFD1A79D6CF009B9F31 /* gofaTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AD1A6DEA1A79D6CF009B9F31 /* gofa */ = {
+			isa = PBXGroup;
+			children = (
+				AD1A6DF11A79D6CF009B9F31 /* Main.storyboard */,
+				AD1A6DED1A79D6CF009B9F31 /* AppDelegate.swift */,
+				ADC1BAA31A7C472900235B09 /* LoginViewController.swift */,
+				AD7D8ECC1A81837F008E400D /* UserViewController.swift */,
+				AD4996A61AA8602600C1BE25 /* TripViewController.swift */,
+				ADC1BAA71A7C498D00235B09 /* SignupViewController.swift */,
+				ADD823681AA7023D009057FB /* ViewController.swift */,
+				AD27BC561A85950800C02E81 /* LocationViewController.swift */,
+				AD2AADAD1A8155D700FFA416 /* Location.swift */,
+				ADE13BBD1A82B86E004717B6 /* User.swift */,
+				AD037D601A90984000DA4BA0 /* Bag.swift */,
+				AD037D621A90986F00DA4BA0 /* BagViewController.swift */,
+				AD2AADAB1A814AFB00FFA416 /* Trip.swift */,
+				AD2AADB31A817A3200FFA416 /* Transaction.swift */,
+				AD1589D21A7E98AE00DBC68A /* UIImage+ColorAtPixel.h */,
+				AD1589D31A7E98AE00DBC68A /* UIImage+ColorAtPixel.m */,
+				AD1589CF1A7E989700DBC68A /* OBShapedButton.h */,
+				AD1589D01A7E989700DBC68A /* OBShapedButton.m */,
+				AD1A6DF61A79D6CF009B9F31 /* LaunchScreen.xib */,
+				AD1A6E0D1A79EC0F009B9F31 /* Images.xcassets */,
+				AD1A6DEB1A79D6CF009B9F31 /* Supporting Files */,
+			);
+			path = gofa;
+			sourceTree = "<group>";
+		};
+		AD1A6DEB1A79D6CF009B9F31 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				AD1A6DEC1A79D6CF009B9F31 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		AD1A6E001A79D6CF009B9F31 /* gofaTests */ = {
+			isa = PBXGroup;
+			children = (
+				AD1A6E031A79D6CF009B9F31 /* gofaTests.swift */,
+				AD1A6E011A79D6CF009B9F31 /* Supporting Files */,
+			);
+			path = gofaTests;
+			sourceTree = "<group>";
+		};
+		AD1A6E011A79D6CF009B9F31 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				AD1A6E021A79D6CF009B9F31 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AD1A6DE71A79D6CF009B9F31 /* gofa */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AD1A6E071A79D6CF009B9F31 /* Build configuration list for PBXNativeTarget "gofa" */;
+			buildPhases = (
+				AD1A6DE41A79D6CF009B9F31 /* Sources */,
+				AD1A6DE51A79D6CF009B9F31 /* Frameworks */,
+				AD1A6DE61A79D6CF009B9F31 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = gofa;
+			productName = gofa;
+			productReference = AD1A6DE81A79D6CF009B9F31 /* gofa.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AD1A6DFC1A79D6CF009B9F31 /* gofaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AD1A6E0A1A79D6CF009B9F31 /* Build configuration list for PBXNativeTarget "gofaTests" */;
+			buildPhases = (
+				AD1A6DF91A79D6CF009B9F31 /* Sources */,
+				AD1A6DFA1A79D6CF009B9F31 /* Frameworks */,
+				AD1A6DFB1A79D6CF009B9F31 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AD1A6DFF1A79D6CF009B9F31 /* PBXTargetDependency */,
+			);
+			name = gofaTests;
+			productName = gofaTests;
+			productReference = AD1A6DFD1A79D6CF009B9F31 /* gofaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AD1A6DE01A79D6CF009B9F31 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = gprod;
+				TargetAttributes = {
+					AD1A6DE71A79D6CF009B9F31 = {
+						CreatedOnToolsVersion = 6.1.1;
+						DevelopmentTeam = X8SZGDNH87;
+					};
+					AD1A6DFC1A79D6CF009B9F31 = {
+						CreatedOnToolsVersion = 6.1.1;
+						TestTargetID = AD1A6DE71A79D6CF009B9F31;
+					};
+				};
+			};
+			buildConfigurationList = AD1A6DE31A79D6CF009B9F31 /* Build configuration list for PBXProject "gofa" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AD1A6DDF1A79D6CF009B9F31;
+			productRefGroup = AD1A6DE91A79D6CF009B9F31 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AD1A6DE71A79D6CF009B9F31 /* gofa */,
+				AD1A6DFC1A79D6CF009B9F31 /* gofaTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AD1A6DE61A79D6CF009B9F31 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD1A6E0E1A79EC0F009B9F31 /* Images.xcassets in Resources */,
+				AD1A6DF31A79D6CF009B9F31 /* Main.storyboard in Resources */,
+				AD1A6DF81A79D6CF009B9F31 /* LaunchScreen.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AD1A6DFB1A79D6CF009B9F31 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AD1A6DE41A79D6CF009B9F31 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ADD823691AA7023D009057FB /* ViewController.swift in Sources */,
+				ADE13BBE1A82B86E004717B6 /* User.swift in Sources */,
+				ADC1BAA41A7C472900235B09 /* LoginViewController.swift in Sources */,
+				AD037D611A90984000DA4BA0 /* Bag.swift in Sources */,
+				AD1589D11A7E989700DBC68A /* OBShapedButton.m in Sources */,
+				AD7D8ECD1A81837F008E400D /* UserViewController.swift in Sources */,
+				AD4996A71AA8602600C1BE25 /* TripViewController.swift in Sources */,
+				AD2AADB41A817A3200FFA416 /* Transaction.swift in Sources */,
+				AD2AADAE1A8155D700FFA416 /* Location.swift in Sources */,
+				AD27BC571A85950800C02E81 /* LocationViewController.swift in Sources */,
+				ADC1BAA81A7C498D00235B09 /* SignupViewController.swift in Sources */,
+				AD1A6DEE1A79D6CF009B9F31 /* AppDelegate.swift in Sources */,
+				AD1589D41A7E98AE00DBC68A /* UIImage+ColorAtPixel.m in Sources */,
+				AD037D631A90986F00DA4BA0 /* BagViewController.swift in Sources */,
+				AD2AADAC1A814AFB00FFA416 /* Trip.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AD1A6DF91A79D6CF009B9F31 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD1A6E041A79D6CF009B9F31 /* gofaTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AD1A6DFF1A79D6CF009B9F31 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AD1A6DE71A79D6CF009B9F31 /* gofa */;
+			targetProxy = AD1A6DFE1A79D6CF009B9F31 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		AD1A6DF11A79D6CF009B9F31 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AD1A6DF21A79D6CF009B9F31 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		AD1A6DF61A79D6CF009B9F31 /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AD1A6DF71A79D6CF009B9F31 /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		AD1A6E051A79D6CF009B9F31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AD1A6E061A79D6CF009B9F31 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AD1A6E081A79D6CF009B9F31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/gofa",
+					"$(PROJECT_DIR)/app-switch-ios-framework-master",
+				);
+				INFOPLIST_FILE = gofa/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				New_Setting = "";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "gofa-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AD1A6E091A79D6CF009B9F31 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/gofa",
+					"$(PROJECT_DIR)/app-switch-ios-framework-master",
+				);
+				INFOPLIST_FILE = gofa/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				New_Setting = "";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "gofa-Bridging-Header.h";
+			};
+			name = Release;
+		};
+		AD1A6E0B1A79D6CF009B9F31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = gofaTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/gofa.app/gofa";
+			};
+			name = Debug;
+		};
+		AD1A6E0C1A79D6CF009B9F31 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = gofaTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/gofa.app/gofa";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AD1A6DE31A79D6CF009B9F31 /* Build configuration list for PBXProject "gofa" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AD1A6E051A79D6CF009B9F31 /* Debug */,
+				AD1A6E061A79D6CF009B9F31 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AD1A6E071A79D6CF009B9F31 /* Build configuration list for PBXNativeTarget "gofa" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AD1A6E081A79D6CF009B9F31 /* Debug */,
+				AD1A6E091A79D6CF009B9F31 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AD1A6E0A1A79D6CF009B9F31 /* Build configuration list for PBXNativeTarget "gofaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AD1A6E0B1A79D6CF009B9F31 /* Debug */,
+				AD1A6E0C1A79D6CF009B9F31 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AD1A6DE01A79D6CF009B9F31 /* Project object */;
+}

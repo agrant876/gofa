@@ -1,0 +1,14 @@
+var http = require('http'); 
+var url = require('url'); 
+
+
+var server = http.createServer(function (req, res) {
+	res.writeHead(200, {'Content-Type': 'text/plain'});
+	print(url.parse(req.url, true)); 
+
+	res.end('okay');
+    });  
+server.listen(Number(process.argv[2])); 
+
+
+

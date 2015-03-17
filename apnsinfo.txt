@@ -1,0 +1,8 @@
+APNS stuff 
+
+
+
+
+Device token: 
+c47701a27a9335022c54cc558046a658d22780215a0fdc04c89d33f6df0e715d
+
