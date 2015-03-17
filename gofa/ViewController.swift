@@ -18,6 +18,7 @@ class ViewController: UIViewController {
     
     // node info 
     let urlstring = "http://localhost:3000/"
+    let urlping = "http://gofa-app.com/ping"
     var url: NSURL!
     
     
@@ -58,7 +59,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var serverResponse: UILabel!
     
     @IBAction func pingServer(sender: UIButton) {
-        let req = NSMutableURLRequest(URL: self.url!)
+        let url = NSURL(string: urlping)
+        let req = NSMutableURLRequest(URL: url!)
         req.HTTPMethod = "GET"
         req.addValue("application/json", forHTTPHeaderField: "Accept")
         let config = NSURLSessionConfiguration.defaultSessionConfiguration()
@@ -66,14 +68,16 @@ class ViewController: UIViewController {
         
         let pingTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
             if (error == nil) {
-                var resArray: NSDictionary! =  NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: nil) as NSDictionary
-                println(resArray)
-                var textResponse = resArray["text"] as String!
-                self.serverResponse.text = textResponse
-                println(resArray["text"] as String!)
-                println(response.description)
+                println("yes, success")
+                //var resArray: NSDictionary! =  NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: nil) as NSDictionary
+                //println(resArray)
+                //var textResponse = resArray["text"] as String!
+                //self.serverResponse.text = textResponse
+                //println(resArray["text"] as String!)
+                //println(response.description)
+            } else {
+                println("nope")
             }
-            
         })
         
         pingTask.resume()
@@ -272,11 +276,6 @@ class ViewController: UIViewController {
             }
         })
     }
-    
-    @IBAction func pingForTransaction(sender: UIButton) {
-        
-    }
-    
     
 }
 

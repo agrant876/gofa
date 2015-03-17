@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>2F32534A-A271-4E8D-9769-1D3083D53866</string>
+	<key>IDESourceControlProjectName</key>
+	<string>gofa</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>E506E4CBFAB1E76163CEA614E23501FA23BB2982</key>
+		<string>https://github.com/agrant876/gofa.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>gofa.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>E506E4CBFAB1E76163CEA614E23501FA23BB2982</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/agrant876/gofa.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>E506E4CBFAB1E76163CEA614E23501FA23BB2982</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>E506E4CBFAB1E76163CEA614E23501FA23BB2982</string>
+			<key>IDESourceControlWCCName</key>
+			<string>gofa</string>
+		</dict>
+	</array>
+</dict>
+</plist>

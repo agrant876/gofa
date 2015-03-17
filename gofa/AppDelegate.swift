@@ -65,6 +65,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func sendProviderDeviceToken(devToken: NSData) {
+        
         let url = NSURL(string: "http://gofa-app.com/register")
         let req = NSMutableURLRequest(URL: url!)
         req.HTTPMethod = "POST"

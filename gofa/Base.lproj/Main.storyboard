@@ -712,7 +712,7 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="pingForTransaction:" destination="CfQ-zV-o0c" eventType="touchUpInside" id="gFB-dh-JMT"/>
+                                    <action selector="pingServer:" destination="CfQ-zV-o0c" eventType="touchUpInside" id="dVm-nK-jA4"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -751,6 +751,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="CBW-Hc-7nV"/>
-        <segue reference="C5i-Ml-3oK"/>
+        <segue reference="Jcj-L7-mFv"/>
     </inferredMetricsTieBreakers>
 </document>
