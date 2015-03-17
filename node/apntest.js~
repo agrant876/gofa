@@ -2,6 +2,7 @@ var apn = require('apn');
 var express = require('express'); 
 var bodyParser = require('body-parser'); 
 
+
 var app = express();
 app.set('port', process.env.PORT || 3000);
 //app.use(bodyParser());
@@ -15,7 +16,8 @@ var apnConnection = new apn.Connection(options);
 
 
 // sending to my iphone 
-var token = "c47701a27a9335022c54cc558046a658d22780215a0fdc04c89d33f6df0e715d";                                                                                      var myDevice = new apn.Device(token);                    
+var token = "c47701a27a9335022c54cc558046a658d22780215a0fdc04c89d33f6df0e715d";
+var myDevice = new apn.Device(token);                    
 
 app.post('/', function (req, res) {
 
@@ -24,8 +26,7 @@ app.post('/', function (req, res) {
 	// print device token
 	
 
-	//res.send({text: 'Hello World!'});                                                                                                             
-	
+	//res.send({text: 'Hello World!'});	
 
 	/*
 	var note = new apn.Notification();

@@ -59,15 +59,24 @@ class ViewController: UIViewController {
     @IBOutlet weak var serverResponse: UILabel!
     
     @IBAction func pingServer(sender: UIButton) {
+        
+        // set up request data
+        var requestInfo = ["userid":self.curUser]
+        var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
+            options:NSJSONWritingOptions.PrettyPrinted, error: nil)
         let url = NSURL(string: urlping)
         let req = NSMutableURLRequest(URL: url!)
-        req.HTTPMethod = "GET"
+        req.HTTPMethod = "POST"
         req.addValue("application/json", forHTTPHeaderField: "Accept")
+        req.HTTPBody = requestData
+        //println(req.HTTPBody)
         let config = NSURLSessionConfiguration.defaultSessionConfiguration()
         let session = NSURLSession(configuration: config);
         
         let pingTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
             if (error == nil) {
+                println("the data..")
+                println(data)
                 println("yes, success")
                 //var resArray: NSDictionary! =  NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: nil) as NSDictionary
                 //println(resArray)
@@ -76,6 +85,7 @@ class ViewController: UIViewController {
                 //println(resArray["text"] as String!)
                 //println(response.description)
             } else {
+                println(error)
                 println("nope")
             }
         })
