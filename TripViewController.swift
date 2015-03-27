@@ -17,12 +17,8 @@ class TripViewController: UIViewController {
     var locationAddress: String!
     var publicTrip = false
 
-    
-    
     var authData: FAuthData!
     var curUserName: String!
-    
-    
     
     @IBOutlet weak var locationLabelName: UILabel!
     
@@ -74,8 +70,6 @@ class TripViewController: UIViewController {
 
         var arrivalTime = Int(ceil(timestamp)) + seconds
         
- 
-
         Trip(userInfo: authData, locationInfo: location, arrivalTimeInfo: arrivalTime, typePublicInfo: publicTrip, destinationInfo: nil)
 
     }
