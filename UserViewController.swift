@@ -26,7 +26,6 @@ class UserViewController: UIViewController {
     
     var buttonColor: UIColor?
     
-    
     @IBOutlet weak var firstNameTxt: UITextField!
     @IBOutlet weak var lastNameTxt: UITextField!
     @IBOutlet weak var userNameTxt: UITextField!
@@ -38,6 +37,9 @@ class UserViewController: UIViewController {
     
     @IBOutlet weak var submitButton: UIButton!
     
+    @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
+        self.view.endEditing(true)
+    }
     
     @IBAction func firstNameEntered(sender: UITextField) {
         hasFirstName = true

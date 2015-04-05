@@ -11,7 +11,7 @@ import UIKit
 
 class LocationViewController: UIViewController {
 
-    var location: String!
+    var locationid: String!
     var locationDict = [String: AnyObject]()
     var locationName: String!
     var locationAddress:String!
@@ -20,23 +20,39 @@ class LocationViewController: UIViewController {
     var curUserName: String!
     var curUser: String!
     
-    var currentTrips: [String :Int]?
-    var trips = [String]()
+    var bagContents: String!
     
-    // trip identifiers for buttons
-    var tripOne: String!
-    var tripTwo: String!
-    var tripThree: String!
+    var locTrips: [String :Int]?
+    var trips = Array<NSDictionary>() //active trips' id's
+    var tripInfo = Array<NSDictionary>() //trip dictionaries
     
+    @IBOutlet weak var noTripsLabel: UILabel!
     
+    // is button displaying trip? anticlockwise
+    var buttontrip1 = false
+    var buttontrip2 = false
+    var buttontrip3 = false
+
+    let urlremovetrip = "http://localhost:3000/removeTrip"
+    let urlgettrips = "http://localhost:3000/getTrips"
+    let urlgettripinfo = "http://localhost:3000/getTripInfo"
+    let urlgetbag = "http://localhost:3000/getbag"
     
-    let urlpinguser = "http://localhost:3000/pingUser"
+    @IBOutlet weak var user1: UILabel!
+    @IBOutlet weak var user2: UILabel!
+    @IBOutlet weak var user3: UILabel!
     
-    @IBOutlet weak var userOne: UILabel!
-    @IBOutlet weak var userTwo: UILabel!
-    @IBOutlet weak var userThree: UILabel!
+    @IBOutlet weak var time1: UILabel!
+    @IBOutlet weak var time2: UILabel!
+    @IBOutlet weak var time3: UILabel!
     
-    @IBOutlet weak var timeOne: UILabel!
+    @IBOutlet weak var min1: UILabel!
+    @IBOutlet weak var min2: UILabel!
+    @IBOutlet weak var min3: UILabel!
+    
+    @IBOutlet weak var topButton: OBShapedButton!
+    @IBOutlet weak var leftButton: OBShapedButton!
+    @IBOutlet weak var rightButton: OBShapedButton!
     
     
     @IBOutlet weak var infoLabel: UILabel!
@@ -45,40 +61,82 @@ class LocationViewController: UIViewController {
     
     // USER INTERACTION
     
+    @IBOutlet weak var confirmationView: UIImageView!
+
     // press button (ping user, basic)
     @IBAction func selectTrip(sender: OBShapedButton) {
+        let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+        let confirmVC:ConfirmationViewController = storyboard.instantiateViewControllerWithIdentifier("confirm") as ConfirmationViewController
+        confirmVC.curUser = self.curUser
+        confirmVC.curUserName = self.curUserName
+        confirmVC.locationid = self.locationid
+        confirmVC.locationName = self.locationDict["name"] as String!
+        confirmVC.locationDict = self.locationDict
+        
         if sender.tag == 1 {
-            var tripIdentifier = tripOne
-            pingUser(tripIdentifier)
+            if (buttontrip1) {
+                println(buttontrip1)
+                var trip = trips[0] as NSDictionary
+                confirmVC.tripid = trip["tripid"] as String
+                confirmVC.tripInfo = tripInfo[0]
+                self.presentViewController(confirmVC, animated: false, completion: nil)
+            }
         }
+        if sender.tag == 2 {
+            if (buttontrip2) {
+                var trip = trips[1] as NSDictionary
+                confirmVC.tripid = trip["tripid"] as String
+                confirmVC.tripInfo = tripInfo[1]
+                self.presentViewController(confirmVC, animated: false, completion: nil)
+            }
+        }
+        if sender.tag == 3 {
+            if (buttontrip3) {
+                var trip = trips[2] as NSDictionary
+                confirmVC.tripid = trip["tripid"] as String
+                confirmVC.tripInfo = tripInfo[2]
+                self.presentViewController(confirmVC, animated: false, completion: nil)
+            }
+        }
+        
     }
     
-    func pingUser(tripid: String!) {
+    @IBAction func viewBag(sender: OBShapedButton) {
+        let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+        let bagVC:BagViewController = storyboard.instantiateViewControllerWithIdentifier("bag") as BagViewController
+        bagVC.curUser = self.curUser
+        bagVC.curUserName = self.curUserName
+        bagVC.location = self.locationid
+        bagVC.locationName = self.locationDict["name"] as String!
+        bagVC.locationDict = self.locationDict
 
-        // set up request
-        var requestInfo:NSDictionary = ["userid": self.curUser, "tripid": tripid]
-        //println(NSJSONSerialization.isValidJSONObject(requestInfo))
-        
+        self.presentViewController(bagVC, animated: false, completion: nil)
+    }
+    
+    @IBAction func home(sender: UIButton) {
+        let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+        let VC:ViewController = storyboard.instantiateViewControllerWithIdentifier("home") as ViewController
+        self.presentViewController(VC, animated: false, completion: nil)
+    }
+    
+    //remove trip and associated PENDING transactions
+    func removeTrip(tripid: String!) {
+        var requestInfo:NSDictionary = ["tripid": tripid]
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
-        
-        let url = NSURL(string: urlpinguser)
+        let url = NSURL(string: urlremovetrip)
         let req = NSMutableURLRequest(URL: url!)
         req.HTTPMethod = "POST"
         req.HTTPBody = requestData
         req.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        //println(req.HTTPBody)
         let config = NSURLSessionConfiguration.defaultSessionConfiguration()
         let session = NSURLSession(configuration: config);
-        
         let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
             if (error == nil) {
                 var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
-                //println(feedback)
                 var status = feedback["status"] as String!
                 if (status == "success") {
-                    self.pingResponse.text = "successfully sent"
-                    println("successfully sent to Brian")
+                    println("successfully deleted trips and pending transactions")
                 }
             } else {
                 println(error)
@@ -89,93 +147,207 @@ class LocationViewController: UIViewController {
         serverTask.resume()
     }
     
-    func setupFirebase()
-    {
-        let locRef = Firebase(url: "https://gofa.firebaseio.com/locations/" + location)
-        let locTripsRef = locRef.childByAppendingPath("trips")
-        locTripsRef.observeEventType(.Value, withBlock: {
-            snapshot in
-            self.currentTrips = snapshot.value as? Dictionary
-            if self.currentTrips == nil {
-                self.updateUI()
-            } else {
-                var index = 0
-                // for every trip at location
-                for (tripIdentifier, toa) in self.currentTrips! {
-                    let date = NSDate()
-                    let timestamp = date.timeIntervalSince1970
-                    println("\(timestamp)")
-                    
-                    // if the toa has passed, remove the trip
-                    if (Int(timestamp) > toa) {
-                        Firebase(url: "https://gofa.firebaseio.com/trips/\(tripIdentifier)").removeValue()
-                        Firebase(url: "https://gofa.firebaseio.com/locations/\(self.location)/trips/\(tripIdentifier)").removeValue()
-                    } else {
-                        println("\(tripIdentifier)")
-                        self.trips.append(tripIdentifier)
-                        self.tripOne = tripIdentifier as String
-                    }
-                }
-                self.updateUI()
-            }
-        })
-    }
-   
-    func updateUI() {
-        
-        if currentTrips == nil {
-            infoLabel.text = "Sorry, no trips right now!"
-        } else {
-            let tripRef = Firebase(url: "https://gofa.firebaseio.com/trips/" + trips[0])
-            
-            // display trip "owner"
-            tripRef.childByAppendingPath("user").observeEventType(.Value, withBlock: {
-                    snapshot in
-                    var user = snapshot.value as String!
-                    let userRef = Firebase(url: "https://gofa.firebaseio.com/users/" + user + "/username")
-                    userRef.observeEventType(.Value, withBlock: {
-                        snapshot in
-                        var username = snapshot.value as String!
-                        self.userOne.text = username
-                    })
-            })
-        
-            // display Time till Arrival (toa - current time)
-            tripRef.childByAppendingPath("toa").observeEventType(.Value, withBlock: {
-                snapshot in
-                var toa = snapshot.value as Int!
-                let date = NSDate()
-                let timestamp = date.timeIntervalSince1970
-                println("\(timestamp)")
-                println("\(toa)")
-                toa = (toa - Int(ceil(timestamp)))
-                // display in minutes and round down
-                toa = Int(floor(Double(toa) / 60.0))
-                self.timeOne.text = "\(toa)"
-            })
-        }
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.curUser = self.authData.uid
-        setupFirebase()
+        getBagContents()
+        getTrips()
     }
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        
         if segue.identifier == "goto_bag" {
             var newBagVC = BagViewController()
             newBagVC = segue.destinationViewController as BagViewController
             newBagVC.authData = self.authData
             newBagVC.curUserName = self.curUserName
-            newBagVC.location = self.location
+            newBagVC.location = self.locationid
             newBagVC.locationName = self.locationDict["name"] as String!
             println(locationDict)
             //newBagVC.locationName = "Wawa"
         }
     }
+    
+    func getBagContents() {
+        var bagInfo = ["userid": self.curUser, "locationid": self.locationid]
+        var bagData = NSJSONSerialization.dataWithJSONObject(bagInfo,
+            options:NSJSONWritingOptions.allZeros, error: nil)
+        let url = NSURL(string: urlgetbag)
+        let req = NSMutableURLRequest(URL: url!)
+        req.HTTPMethod = "POST"
+        req.HTTPBody = bagData
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: config);
+        let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+            if (error == nil) {
+                var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+                self.bagContents = feedback["contents"] as? String
+                println("successfully got bag")
+            } else {
+                println(error)
+                println("nope")
+            }
+        })
+        serverTask.resume()
+    }
+    
+    func getTrips() {
+        var requestInfo:NSDictionary = ["locationid": self.locationid]
+        var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
+            options:NSJSONWritingOptions.allZeros, error: nil)
+        let url = NSURL(string: urlgettrips)
+        let req = NSMutableURLRequest(URL: url!)
+        req.HTTPMethod = "POST"
+        req.HTTPBody = requestData
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        println(req.HTTPBody)
+        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: config);
+        let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+            if (error == nil) {
+                var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+                var status = feedback["status"] as String!
+                if (status == "success") {
+                    println("successfully retrieved trips")
+                    println(feedback["trips"])
+                    self.trips = feedback["trips"] as Array
+                    if self.trips.count > 0 {
+                        //display trips
+                        self.noTripsLabel.hidden = true
+                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                            self.displayTrips()
+                        })
+                    } else {
+                        //display no trips
+                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        })
+                    }
+                }
+            } else {
+                println(error)
+                println("nope")
+            }
+        })
+        
+        serverTask.resume()
+    }
+    
+    func displayTrips() {
+        // sort trip array according to time of arrival
+        self.trips = sorted(self.trips, soonest)
+        // get info for all the trips in location (D.T.R: limit how many are loaded)
+        for (var i = 0; i < self.trips.count; i++) {
+            var trip = self.trips[i] as NSDictionary
+            println(trip)
+            var tripid = trip["tripid"] as String
+            var toa = trip["toa"] as Int
+            var requestInfo:NSDictionary = ["tripid": tripid, "toa": toa]
+            var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
+                options:NSJSONWritingOptions.allZeros, error: nil)
+            let url = NSURL(string: urlgettripinfo)
+            let req = NSMutableURLRequest(URL: url!)
+            req.HTTPMethod = "POST"
+            req.HTTPBody = requestData
+            req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+            let session = NSURLSession(configuration: config);
+            let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+                if (error == nil) {
+                    var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+                    var status = feedback["status"] as String!
+                    if (status == "success") {
+                        self.tripInfo.append(feedback["tripInfo"] as NSDictionary)
+                        println("successfully got transaction info")
+                        if (self.buttontrip1 == false) {
+                            //update top button
+                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                                self.updateButton(1, tripInfo: feedback["tripInfo"] as NSDictionary)
+                            })
+                        }
+                        else if (self.buttontrip2 == false) {
+                            //update left button
+                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                                self.updateButton(2, tripInfo: feedback["tripInfo"] as NSDictionary)
+                            })
+                        }
+                        else if (self.buttontrip3 == false) {
+                            //update right button 
+                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                                self.updateButton(3, tripInfo: feedback["tripInfo"] as NSDictionary)
+                            })
+                        }
+                    }
+                } else {
+                    println(error)
+                    println("nope")
+                }
+            })
+            
+            serverTask.resume()
+        }
+    }
 
-
+    func updateButton(tag: Int!, tripInfo: NSDictionary) {
+        println(tripInfo)
+        var toa = tripInfo["toa"] as Int
+        let date = NSDate()
+        let timestamp = date.timeIntervalSince1970
+        toa = (toa - Int(ceil(timestamp)))
+        // display in minutes and round down
+        toa = Int(floor(Double(toa) / 60.0))
+        if (tag == 1) {
+            self.user1.text = tripInfo["userName"] as String!
+            self.time1.text = "\(toa)"
+            self.user1.sizeToFit()
+            self.buttontrip1 = true
+            self.user1.hidden = false
+            self.time1.hidden = false
+            self.min1.hidden = false
+            var userid = tripInfo["user"] as String //trip owner
+            // if trip owner is not current user, enable button
+            if (self.curUser == userid) {
+                println("***")
+                println(userid)
+                self.topButton.enabled = false
+            }
+        }
+        if (tag == 2) {
+            self.user2.text = tripInfo["userName"] as String!
+            self.time2.text = "\(toa)"
+            self.user2.sizeToFit()
+            self.buttontrip2 = true
+            self.user2.hidden = false
+            self.time2.hidden = false
+            self.min2.hidden = false
+            var userid = tripInfo["user"] as String //trip owner
+            if (self.curUser != userid) {
+                println("****")
+                println(userid)
+                self.leftButton.enabled = true
+            }
+        }
+        if (tag == 3) {
+            self.user3.text = tripInfo["userName"] as String!
+            self.time3.text = "\(toa)"
+            self.user3.sizeToFit()
+            self.buttontrip3 = true
+            self.user3.hidden = false
+            self.time3.hidden = false
+            self.min3.hidden = false
+            var userid = tripInfo["user"] as String //trip owner
+            if (self.curUser != userid) {
+                self.rightButton.enabled = true
+            }
+        }
+    }
+    
+    func soonest(trip1: NSDictionary, trip2: NSDictionary) -> Bool {
+        println(trip1)
+        println(trip1[0])
+        var toa1 = trip1["toa"] as Int
+        var toa2 = trip2["toa"] as Int
+        return toa1 < toa2
+    }
+    
 }

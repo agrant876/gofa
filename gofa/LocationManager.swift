@@ -21,14 +21,14 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     var gateRegion: CLCircularRegion!
     var dillsbury2: CLCircularRegion!
     var centerLoc: CLLocation!
-
+    var myRegion: CLCircularRegion!
+    
     // register regions nearest to the users current location
     func registerRegions() {
         self.locManager = CLLocationManager()
         locManager.delegate = self
         locManager.requestAlwaysAuthorization()
         locManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
-        //registerRegions()
         
         // temporary, dtr: array that updates with closest 20 stores to user
         //firestone
@@ -39,11 +39,17 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         //40.347130, -74.661525
         // down the hall
         // 40.345985, -74.660765
-        var latitude:CLLocationDegrees = 40.345985
-        var longitude:CLLocationDegrees = -74.660765
+        // southeast of frist
+        //40.346454, -74.654140
+        // dillon west
+        //40.345620, -74.659138
+        // spellman
+        // 40.345044, -74.659073
+        var latitude:CLLocationDegrees = 40.345044
+        var longitude:CLLocationDegrees = -74.659073
         var center:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude, longitude)
         var radius:CLLocationDistance = CLLocationDistance(5.0)
-        var identifier:String = "downthehall"
+        var identifier:String = "spellman"
         var overlay = MKCircle(centerCoordinate: center, radius: radius)
         registerRegionWithCircularOverlay(overlay, identifier: identifier)
     }
@@ -62,21 +68,31 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         //println(geoRegion)
         geoRegion.notifyOnEntry = true
         geoRegion.notifyOnExit = true
-        self.locManager.startMonitoringForRegion(geoRegion)
+        println("---------")
+        println(geoRegion)
+        println(geoRegion.notifyOnEntry)
+        println(geoRegion.notifyOnExit)
+        println("---------")
+        self.centerLoc = CLLocation(latitude: geoRegion.center.latitude, longitude: geoRegion.center.longitude)
+        self.myRegion = geoRegion
+
         locManager.startUpdatingLocation()
-        /*var monitoredRegions = self.locManager.monitoredRegions
-        for region in monitoredRegions {
+        locManager.startMonitoringForRegion(geoRegion)
+        //self.locManager.requestStateForRegion(geoRegion)
+        //var monitoredRegions = self.locManager.monitoredRegions
+        /*for region in monitoredRegions {
             var name = (region as CLRegion).identifier
             if (name == "mendell") {
                 println("mendell")
                 var region2 = region as CLCircularRegion
-                println(region.notifyOnEntry)
+                println(region2)
+                println(region2.notifyOnEntry)
                 self.centerLoc = CLLocation(latitude: region2.center.latitude, longitude: region2.center.longitude)
-                self.dillsbury2 = region2
                 //self.locManager.startUpdatingLocation()
-                self.locManager.requestStateForRegion(region as CLRegion)
+                //self.locManager.requestStateForRegion(region as CLRegion)
             }
-        } */
+        }
+        */
 
         if UIApplication.sharedApplication().backgroundRefreshStatus == UIBackgroundRefreshStatus.Available {
             println("all good")
@@ -85,7 +101,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         {
             println("all good again")
         }
-        println(self.locManager.monitoredRegions)
+        //println(self.locManager.monitoredRegions)
     }
     
     func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
@@ -99,6 +115,10 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         println(manager.location)
         println(manager.desiredAccuracy)
         var region = region as CLCircularRegion
+        var regionLoc = CLLocation(latitude: region.center.latitude, longitude: region.center.longitude)
+        //var dist = manager.location.distanceFromLocation(regionLoc)
+        println("!!!!!!!!!!!!!!!!!")
+       //println(dist)
         /*if region.containsCoordinate(manager.location.coordinate) {
             println("i'm in firestone. crap.")
         } else {
@@ -108,7 +128,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         //var distance = manager.location.distanceFromLocation(fromLoc)
         // println(distance)*/
         if (state == CLRegionState.Inside) {
-            println("I'm down the hall")
+            println("I'm in dillon west region")
         } else {
             println("keep trying")
         }
@@ -119,24 +139,28 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     }
     
     func locationManager(manager: CLLocationManager!, didEnterRegion region: CLRegion!) {
-        NSNotificationCenter.defaultCenter().postNotificationName("regionEntered", object: nil)
+        println("entered region")
+        var regionInfo = ["region": region.identifier]
+        NSNotificationCenter.defaultCenter().postNotificationName("regionEntered", object: nil, userInfo: regionInfo)
     }
     
     func locationManager(manager: CLLocationManager!, didExitRegion region: CLRegion!) {
-        NSNotificationCenter.defaultCenter().postNotificationName("regionExited", object: nil)
+        println("exited region")
+        var regionInfo = ["region": region.identifier]
+        NSNotificationCenter.defaultCenter().postNotificationName("regionExited", object: nil, userInfo: regionInfo)
     }
     
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         let location = locations.last as CLLocation
         //println(location)
-        //var dist = location.distanceFromLocation(self.centerLoc)
+        var dist = location.distanceFromLocation(self.centerLoc)
         //println(location.coordinate.latitude, location.coordinate.longitude)
-        //println(dist)
+        println(dist)
        /* if self.dillsbury2.containsCoordinate(location.coordinate) {
             // alert user
             NSNotificationCenter.defaultCenter().postNotificationName("regionEntered", object: nil)
         }*/
-    
+      //  self.locManager.requestStateForRegion(myRegion)
     }
 
 

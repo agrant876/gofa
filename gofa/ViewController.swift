@@ -53,16 +53,20 @@ class ViewController: UIViewController {
     @IBOutlet weak var leftLoc: UILabel!
     
     @IBOutlet weak var postTripLabel: UILabel!
-    @IBOutlet weak var postTripButton: UIButton!
+    @IBOutlet weak var modeButton: UIButton!
     
     
     @IBOutlet weak var userName: UIButton!
     
-    @IBAction func activateTripMode(sender: UIButton) {
+    @IBAction func switchMode(sender: UIButton) {
         postTripLabel.text = "Where are you going?"
-        postTripButton.setTitle("", forState: .Normal)
-        postTripButton.enabled = false
-        tripMode = true
+        if tripMode == false {
+            modeButton.setTitle("SHOP", forState: .Normal)
+            tripMode = true
+        } else {
+            tripMode = false
+            modeButton.setTitle("POST", forState: .Normal)
+        }
     }
     
     /// VENMO TESTS /////
@@ -106,8 +110,6 @@ class ViewController: UIViewController {
         let config = NSURLSessionConfiguration.defaultSessionConfiguration()
         let session = NSURLSession(configuration: config);
         
-        
-        
         let pingTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
             if (error == nil) {
                 println("the data..")
@@ -143,9 +145,36 @@ class ViewController: UIViewController {
     
     @IBAction func touchLocButton(sender: OBShapedButton) {
         if tripMode == true {
-            performSegueWithIdentifier("goto_trip", sender: sender)
+            let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+            let newTripVC:TripViewController = storyboard.instantiateViewControllerWithIdentifier("trip") as TripViewController
+            newTripVC.curUser = self.curUser
+            newTripVC.curUserName = self.curUserName
+            
+            var button = sender as OBShapedButton
+            if button.tag == 0 {
+                newTripVC.locationid = self.topLocKey
+                newTripVC.locationDict = self.topLocDict
+            } else if button.tag == 1 {
+                newTripVC.locationid = self.rightLocKey
+                newTripVC.locationDict = self.rightLocDict
+            }
+            self.presentViewController(newTripVC, animated: false, completion: nil)
         } else {
-            performSegueWithIdentifier("goto_location", sender: sender)
+            let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+            let locVC:LocationViewController = storyboard.instantiateViewControllerWithIdentifier("location") as LocationViewController
+            locVC.authData = self.authData
+            locVC.curUser = self.curUser
+            locVC.curUserName = self.curUserName
+            
+            var button = sender as OBShapedButton
+            if button.tag == 0 {
+                locVC.locationid = self.topLocKey
+                locVC.locationDict = self.topLocDict
+            } else if button.tag == 1 {
+                locVC.locationid = self.rightLocKey
+                locVC.locationDict = self.rightLocDict
+            }
+            self.presentViewController(locVC, animated: false, completion: nil)
         }
     }
    
@@ -197,27 +226,34 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserverForName("regionEntered", object: nil, queue: nil, usingBlock: { (ViewController) -> Void in
-                println("got notif")
-                let alertController = UIAlertController(title: "Hello!", message: "You entered a marked region", preferredStyle: UIAlertControllerStyle.Alert)
-                let okAction = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Cancel, handler: { (action) -> Void in
-                })
-                alertController.addAction(okAction)
-                self.presentViewController(alertController, animated:true, completion:nil)
-        })
-        
-        NSNotificationCenter.defaultCenter().addObserverForName("regionExited", object: nil, queue: nil, usingBlock: { (ViewController) -> Void in
+        //var myLocationManager = LocationManager.sharedInstance
+        //myLocationManager.registerRegions()
+
+        NSNotificationCenter.defaultCenter().addObserverForName("regionEntered", object: nil, queue: nil) { (notif) -> Void in
             println("got notif")
-            let alertController = UIAlertController(title: "Hello!", message: "You exited a marked region", preferredStyle: UIAlertControllerStyle.Alert)
+            var regionInfo = notif.userInfo as [String: String!]
+            var regionName = regionInfo["region"] as String!
+            let alertController = UIAlertController(title: "Hello!", message: "You entered a marked region " + regionName, preferredStyle: UIAlertControllerStyle.Alert)
+            let okAction = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Cancel, handler: { (action) -> Void in
+            })
+            alertController.addAction(okAction)
+            self.presentViewController(alertController, animated:true, completion:nil)
+        }
+        
+        NSNotificationCenter.defaultCenter().addObserverForName("regionExited", object: nil, queue: nil, usingBlock: { (notif) -> Void in
+            println("got notif")
+            var regionInfo = notif.userInfo as [String: String!]
+            var regionName = regionInfo["region"] as String!
+            let alertController = UIAlertController(title: "Hello!", message: "You exited a marked region " + regionName, preferredStyle: UIAlertControllerStyle.Alert)
             let okAction = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Cancel, handler: { (action) -> Void in
             })
             alertController.addAction(okAction)
             self.presentViewController(alertController, animated:true, completion:nil)
         })
 
-        
-        var myLocationManager = LocationManager.sharedInstance
-        myLocationManager.registerRegions()
+    
+        //var myLocationManager = LocationManager.sharedInstance
+        //myLocationManager.registerRegions()
         
         //println(self.locManager)
         //if (self.locManager == nil) {
@@ -273,7 +309,7 @@ class ViewController: UIViewController {
     func updateUI() {
        // println(self.curUserName)
     }
-
+    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     
         if segue.identifier == "goto_trip" {
@@ -284,10 +320,10 @@ class ViewController: UIViewController {
             
             var button = sender as OBShapedButton
             if button.tag == 0 {
-                newTripVC.location = self.topLocKey
+                newTripVC.locationid = self.topLocKey
                 newTripVC.locationDict = self.topLocDict
             } else if button.tag == 1 {
-                newTripVC.location = self.rightLocKey
+                newTripVC.locationid = self.rightLocKey
                 newTripVC.locationDict = self.rightLocDict
             }
         }
@@ -300,11 +336,11 @@ class ViewController: UIViewController {
             
             var button = sender as OBShapedButton
             if button.tag == 0 {
-                newLocVC.location = self.topLocKey
+                newLocVC.locationid = self.topLocKey
                 newLocVC.locationDict = self.topLocDict
             } else if button.tag == 1 {
                 println("correct")
-                newLocVC.location = self.rightLocKey
+                newLocVC.locationid = self.rightLocKey
                 newLocVC.locationDict = self.rightLocDict
             }
             /*
@@ -319,6 +355,13 @@ class ViewController: UIViewController {
                 var newNotifVC = NotificationViewController()
                 newNotifVC = segue.destinationViewController as NotificationViewController
                 newNotifVC.transaction = self.transaction
+                newNotifVC.curUser = self.curUser
+        }
+        if segue.identifier == "goto_transactions" {
+                var newTransVC = TransactionViewController()
+                newTransVC = segue.destinationViewController as TransactionViewController
+                newTransVC.curUser = self.curUser
+                newTransVC.getTransactions(self.curUser)
         }
     }
     
@@ -372,10 +415,9 @@ class ViewController: UIViewController {
             if (error == nil) {
                 var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
                 //println(feedback)
-                var transaction: AnyObject? = feedback["transaction"] as AnyObject?
-                if transaction != nil {
-                    println(transaction)
-                    self.transaction = transaction as Dictionary!
+                var hasNotif = feedback["hasNotif"] as String!
+                if  hasNotif == "true" {
+                    self.transaction = feedback["transaction"] as Dictionary!
                     //there are unseen transactions, present notification view controller
                     self.performSegueWithIdentifier("goto_notif", sender:self)
                     //remoteNotif = remoteNotif as NSDictionary!

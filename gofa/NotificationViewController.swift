@@ -16,6 +16,8 @@ class NotificationViewController: UIViewController {
     var notification: NSDictionary? //for when app is launched from notification
     var transaction: NSDictionary? //for when app is launched, or brought to foreground with app icon
 
+    var transactionid: String!
+    
     var requestInfo: NSDictionary!
     var curUser: String?
     
@@ -46,7 +48,7 @@ class NotificationViewController: UIViewController {
     func deferTransaction() {
         var transaction = self.transaction!
         var transactionid = transaction["id"] as String!
-        var userid = transaction["customer"] as String!
+        var userid = curUser as String!
         var reqInfo:NSDictionary = ["transactionid": transactionid, "userid": userid]
         var reqData = NSJSONSerialization.dataWithJSONObject(reqInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
@@ -83,9 +85,8 @@ class NotificationViewController: UIViewController {
     }
     
     func pingUserAccept() {
-        var acceptInfo: NSDictionary! = requestInfo
-        acceptInfo.setValue(curUser, forKey: "senderid")
-        var acceptData = NSJSONSerialization.dataWithJSONObject(acceptInfo,
+        var requestInfo:NSDictionary = ["transactionid": self.transactionid, "userid": self.curUser as String!]
+        var acceptData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
         
         let url = NSURL(string: urlpinguseraccept)
@@ -104,7 +105,7 @@ class NotificationViewController: UIViewController {
                 var status = feedback["status"] as String!
                 if (status == "success") {
                     //self.pingResponse.text = "successfully sent"
-                    println("successfully sent acceptance of request to" + (self.requestInfo["userid"] as String!))
+                    //println("successfully sent acceptance of request to" + (self.requestInfo["userid"] as String!))
                 }
             } else {
                 println(error)
@@ -130,6 +131,7 @@ class NotificationViewController: UIViewController {
             customerName.titleLabel?.text = notification!["messageFrom"] as String!
             locationLabel.text = notification!["location"] as String!
             bagContentsLabel.text = notification!["bag"] as String!
+            self.transactionid = notification!["transactionid"] as String!
         } else {
             //app not launched from notification
             //get relevant info for transaction from server
@@ -139,8 +141,8 @@ class NotificationViewController: UIViewController {
     
     func getTransactionInfo() {
         var transaction = self.transaction!
-        var transactionid = transaction["id"] as String!
-        var reqInfo:NSDictionary = ["transactionid": transactionid]
+        self.transactionid = transaction["id"] as String!
+        var reqInfo:NSDictionary = ["transactionid": self.transactionid]
         var reqData = NSJSONSerialization.dataWithJSONObject(reqInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
         let url = NSURL(string: urlgettransinfo)

@@ -11,20 +11,28 @@ import UIKit
 
 class TripViewController: UIViewController {
 
-    var location: String!
+    var locationid: String!
     var locationDict = [String: AnyObject]()
     var locationName: String!
     var locationAddress: String!
     var publicTrip = false
 
     var authData: FAuthData!
+    var curUser: String!
     var curUserName: String!
+    
+    let urlposttrip = "http://localhost:3000/postTrip"
+    
     
     @IBOutlet weak var locationLabelName: UILabel!
     
     @IBOutlet weak var locationLabelAddress: UILabel!
   
     @IBOutlet weak var timeTillArrival: UITextField!
+    
+    
+    @IBOutlet weak var posteditButton: UIButton!
+    @IBOutlet weak var tripPostedLabel: UILabel!
     
     @IBOutlet weak var privateButton: UIButton!
     @IBOutlet weak var publicButton: UIButton!
@@ -42,8 +50,6 @@ class TripViewController: UIViewController {
         privateButton.enabled = false
         privateButton.alpha = 0.25
         publicButton.alpha = 1
-        
-        
     }
     
     @IBAction func selectPublic(sender: UIButton) {
@@ -70,41 +76,64 @@ class TripViewController: UIViewController {
 
         var arrivalTime = Int(ceil(timestamp)) + seconds
         
-        Trip(userInfo: authData, locationInfo: location, arrivalTimeInfo: arrivalTime, typePublicInfo: publicTrip, destinationInfo: nil)
+        
+        var requestInfo:NSDictionary = ["userid": self.curUser, "locationid": self.locationid, "toa": arrivalTime, "public": false]
+        var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
+            options:NSJSONWritingOptions.allZeros, error: nil)
+        let url = NSURL(string: urlposttrip)
+        let req = NSMutableURLRequest(URL: url!)
+        req.HTTPMethod = "POST"
+        req.HTTPBody = requestData
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: config);
+        let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+            if (error == nil) {
+                var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+                var status = feedback["status"] as String!
+                if (status == "success") {
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        self.tripPosted()
+                    })
+                }
+            } else {
+                println(error)
+                println("nope")
+            }
+        })
+        serverTask.resume()
 
+        // Trip(userInfo: authData, locationInfo: location, arrivalTimeInfo: arrivalTime, typePublicInfo: publicTrip, destinationInfo: nil)
     }
     
+    @IBAction func backToHome(sender: UIButton) {
+        let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+        let VC:ViewController = storyboard.instantiateViewControllerWithIdentifier("home") as ViewController
+        self.presentViewController(VC, animated: false, completion: nil)
+    }
+
+    // this function is called when a trip was successfully posted. It does the necessary updates to the UI.
+    func tripPosted() {
+        self.posteditButton.titleLabel?.text = "EDIT"
+        self.tripPostedLabel.hidden = false
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         updateUI()
         // Do any additional setup after loading the view, typically from a nib.
     }
-    /*
-    func setupFirebase(completion:(snapshot:FDataSnapshot!)->()) {
-        
-        let queue:dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
-        dispatch_async(queue, {
-            self.locationRef = Firebase(url:"https://gofa.firebaseio.com/locations/wawa")
-            self.locationRef.observeEventType(.Value, withBlock: {
-                snapshot in
-                println(snapshot)
-                completion(snapshot: snapshot)
-                // self.address = snapshot.value["address"] as? String
-            })
-        })
-    }*/
-
     
     func updateUI() {
-    println(self.location)
         self.locationLabelName.text = self.locationDict["name"] as? String
         self.locationLabelName.sizeToFit()
         self.locationLabelAddress.text = self.locationDict["address"] as? String
         timeTillArrival.text = "0"
-        privateButton.enabled = false
+        /*privateButton.enabled = false
         privateButton.alpha = 0.25
         rightButton.enabled = false
         leftButton.enabled = false
         topButton.enabled = false
+        */
     }
 }

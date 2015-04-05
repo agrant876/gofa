@@ -18,9 +18,11 @@ class BagViewController: UIViewController, UITextViewDelegate {
     var curUserName: String!
     var location: String!
     var locationName: String!
+    var locationDict = [String: AnyObject]()
     var bagContents: String?
     
-    let urlbag = "http://localhost:3000/bag"
+    
+    let urlsavebag = "http://localhost:3000/savebag"
     let urlgetbag = "http://localhost:3000/getbag"
     
     @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
@@ -40,7 +42,6 @@ class BagViewController: UIViewController, UITextViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         bagTextView.delegate = self
-        self.curUser = authData.uid
         self.placeholderLabel.hidden = true
         self.activityIndicator.startAnimating()
         //locationLabel.text = locationName
@@ -60,6 +61,17 @@ class BagViewController: UIViewController, UITextViewDelegate {
     }
 
     
+    @IBAction func backToLocation(sender: UIButton) {
+        let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+        let locVC:LocationViewController = storyboard.instantiateViewControllerWithIdentifier("location") as LocationViewController
+        locVC.curUser = self.curUser
+        locVC.curUserName = self.curUserName
+        locVC.locationid = self.location
+        locVC.locationDict = self.locationDict
+        self.presentViewController(locVC, animated: false, completion: nil)
+    }
+    
+    
     @IBAction func saveBag(sender: UIButton) {
         var bagContents = bagTextView.text;
         var bagInfo = ["contents": bagContents, "userid": self.curUser, "locationid": self.location]
@@ -69,7 +81,7 @@ class BagViewController: UIViewController, UITextViewDelegate {
         var bagData = NSJSONSerialization.dataWithJSONObject(bagInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
         
-        let url = NSURL(string: urlbag)
+        let url = NSURL(string: urlsavebag)
         let req = NSMutableURLRequest(URL: url!)
         req.HTTPMethod = "POST"
         req.HTTPBody = bagData
@@ -148,8 +160,9 @@ class BagViewController: UIViewController, UITextViewDelegate {
     
     func updateUI() {
 
-        locationLabel.text = locationName
-      
+        self.locationName.replaceRange(locationName.startIndex...locationName.startIndex, with: String(locationName[locationName.startIndex]).capitalizedString)
+        locationLabel.text = self.locationName
+
         self.bagTextView.layer.cornerRadius = 8
         
         

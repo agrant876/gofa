@@ -17,6 +17,10 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var txtEmail: UITextField!
     @IBOutlet weak var txtPassword: UITextField!
     
+    @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
+        self.view.endEditing(true)
+    }
+    
     @IBAction func signinTapped(sender: UIButton) {
         var email:NSString = txtEmail.text
         var password:NSString = txtPassword.text

@@ -17,6 +17,9 @@ class SignupViewController: UIViewController {
     @IBOutlet weak var txtPassword: UITextField!
     @IBOutlet weak var txtPasswordConfirm: UITextField!
     
+    @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
+        self.view.endEditing(true)
+    }
     
     @IBAction func signupTapped(sender: UIButton) {
     
@@ -33,12 +36,15 @@ class SignupViewController: UIViewController {
             ref.createUser(email, password: password) {
                 error, authData in
                 if error != nil {
+                    println(error)
                     // an error occured while registering user
                 } else {
                     // user is registered, sign in user
                     ref.authUser(email, password: password) {
                         error, authData in
                         if error != nil {
+                            println("error signing in user")
+                            println(error)
                             // an error occured while attempting login
                         } else {
                             // user is logged in, check authData for data
@@ -46,7 +52,7 @@ class SignupViewController: UIViewController {
                 
                             // create new User
                             User.newUser(authData)
-                            
+                            self.newAuthData = authData
                             self.performSegueWithIdentifier("goto_userinfo", sender: self)
                         }
                     }

@@ -32,12 +32,15 @@
 		AD2AADAE1A8155D700FFA416 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2AADAD1A8155D700FFA416 /* Location.swift */; };
 		AD2AADB41A817A3200FFA416 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2AADB31A817A3200FFA416 /* Transaction.swift */; };
 		AD4996A71AA8602600C1BE25 /* TripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4996A61AA8602600C1BE25 /* TripViewController.swift */; };
+		AD4B4C881ACF735D007D929E /* ConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4B4C871ACF735D007D929E /* ConfirmationViewController.swift */; };
+		AD5407231ACB04920067E653 /* TransactionInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5407221ACB04920067E653 /* TransactionInfoViewController.swift */; };
 		AD79693C1AC4560000D0A17B /* TransactionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD79693B1AC4560000D0A17B /* TransactionViewController.swift */; };
 		AD7D8ECD1A81837F008E400D /* UserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7D8ECC1A81837F008E400D /* UserViewController.swift */; };
 		AD863BC81ABCF68F00960AC4 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD863BC71ABCF68F00960AC4 /* LocationManager.swift */; };
 		ADC026221ABA2EDB00B265B1 /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC026211ABA2EDB00B265B1 /* NotificationViewController.swift */; };
 		ADC1BAA41A7C472900235B09 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC1BAA31A7C472900235B09 /* LoginViewController.swift */; };
 		ADC1BAA81A7C498D00235B09 /* SignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC1BAA71A7C498D00235B09 /* SignupViewController.swift */; };
+		ADD62AC21AC6802500F6EA44 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADD62AC11AC6802500F6EA44 /* CoreLocation.framework */; };
 		ADD823691AA7023D009057FB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD823681AA7023D009057FB /* ViewController.swift */; };
 		ADE13BBE1A82B86E004717B6 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE13BBD1A82B86E004717B6 /* User.swift */; };
 /* End PBXBuildFile section */
@@ -86,12 +89,15 @@
 		AD2AADAD1A8155D700FFA416 /* Location.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		AD2AADB31A817A3200FFA416 /* Transaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Transaction.swift; path = ../Transaction.swift; sourceTree = "<group>"; };
 		AD4996A61AA8602600C1BE25 /* TripViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TripViewController.swift; path = ../TripViewController.swift; sourceTree = "<group>"; };
+		AD4B4C871ACF735D007D929E /* ConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmationViewController.swift; sourceTree = "<group>"; };
+		AD5407221ACB04920067E653 /* TransactionInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionInfoViewController.swift; sourceTree = "<group>"; };
 		AD79693B1AC4560000D0A17B /* TransactionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionViewController.swift; sourceTree = "<group>"; };
 		AD7D8ECC1A81837F008E400D /* UserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserViewController.swift; path = ../UserViewController.swift; sourceTree = "<group>"; };
 		AD863BC71ABCF68F00960AC4 /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ADC026211ABA2EDB00B265B1 /* NotificationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
 		ADC1BAA31A7C472900235B09 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		ADC1BAA71A7C498D00235B09 /* SignupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SignupViewController.swift; path = ../SignupViewController.swift; sourceTree = "<group>"; };
+		ADD62AC11AC6802500F6EA44 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		ADD823681AA7023D009057FB /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		ADE13BBD1A82B86E004717B6 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		C1AEE4062B1367D2E1FFD863 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -102,6 +108,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADD62AC21AC6802500F6EA44 /* CoreLocation.framework in Frameworks */,
 				AD1589D61A7E9EA200DBC68A /* CoreGraphics.framework in Frameworks */,
 				AD1A6E411A7B407E009B9F31 /* UIKit.framework in Frameworks */,
 				AD1A6E3F1A7B4074009B9F31 /* Foundation.framework in Frameworks */,
@@ -163,18 +170,20 @@
 				AD1A6DF11A79D6CF009B9F31 /* Main.storyboard */,
 				AD1A6DED1A79D6CF009B9F31 /* AppDelegate.swift */,
 				ADD823681AA7023D009057FB /* ViewController.swift */,
+				AD27BC561A85950800C02E81 /* LocationViewController.swift */,
+				AD4B4C871ACF735D007D929E /* ConfirmationViewController.swift */,
+				AD79693B1AC4560000D0A17B /* TransactionViewController.swift */,
+				AD5407221ACB04920067E653 /* TransactionInfoViewController.swift */,
+				AD037D621A90986F00DA4BA0 /* BagViewController.swift */,
 				ADC026211ABA2EDB00B265B1 /* NotificationViewController.swift */,
 				AD863BC71ABCF68F00960AC4 /* LocationManager.swift */,
 				ADC1BAA31A7C472900235B09 /* LoginViewController.swift */,
 				AD7D8ECC1A81837F008E400D /* UserViewController.swift */,
 				AD4996A61AA8602600C1BE25 /* TripViewController.swift */,
 				ADC1BAA71A7C498D00235B09 /* SignupViewController.swift */,
-				AD27BC561A85950800C02E81 /* LocationViewController.swift */,
-				AD79693B1AC4560000D0A17B /* TransactionViewController.swift */,
 				AD2AADAD1A8155D700FFA416 /* Location.swift */,
 				ADE13BBD1A82B86E004717B6 /* User.swift */,
 				AD037D601A90984000DA4BA0 /* Bag.swift */,
-				AD037D621A90986F00DA4BA0 /* BagViewController.swift */,
 				AD2AADAB1A814AFB00FFA416 /* Trip.swift */,
 				AD2AADB31A817A3200FFA416 /* Transaction.swift */,
 				AD1589D21A7E98AE00DBC68A /* UIImage+ColorAtPixel.h */,
@@ -225,6 +234,7 @@
 		F9C32AFC3F27E507CAE57FA5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ADD62AC11AC6802500F6EA44 /* CoreLocation.framework */,
 				1D3B87B69326EAD6C7D01027 /* libPods.a */,
 			);
 			name = Frameworks;
@@ -366,6 +376,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD5407231ACB04920067E653 /* TransactionInfoViewController.swift in Sources */,
 				ADD823691AA7023D009057FB /* ViewController.swift in Sources */,
 				ADE13BBE1A82B86E004717B6 /* User.swift in Sources */,
 				ADC026221ABA2EDB00B265B1 /* NotificationViewController.swift in Sources */,
@@ -379,6 +390,7 @@
 				AD2AADB41A817A3200FFA416 /* Transaction.swift in Sources */,
 				AD2AADAE1A8155D700FFA416 /* Location.swift in Sources */,
 				AD27BC571A85950800C02E81 /* LocationViewController.swift in Sources */,
+				AD4B4C881ACF735D007D929E /* ConfirmationViewController.swift in Sources */,
 				ADC1BAA81A7C498D00235B09 /* SignupViewController.swift in Sources */,
 				AD1A6DEE1A79D6CF009B9F31 /* AppDelegate.swift in Sources */,
 				AD1589D41A7E98AE00DBC68A /* UIImage+ColorAtPixel.m in Sources */,
