@@ -114,8 +114,6 @@ class NotificationViewController: UIViewController {
         })
         
         serverTask.resume()
-
-    
     }
     
     override func viewDidLoad() {

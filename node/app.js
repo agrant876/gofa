@@ -57,6 +57,8 @@ app.post('/unseenNotif', function(req, res) {
 					console.log("I was called!"); 
 					res.json({"transaction": transactionInfo, "hasNotif": "true"});
 				    });
+			    } else { 
+				res.json({"transaction": null, "hasNotif": "false"}); 
 			    }
 			}
 		    }
@@ -74,40 +76,74 @@ app.post('/getTransactionInfo', function(req, res) {
 		var transInfo = snapshot.val(); 
 		var status = transInfo["status"]; 
 		var customerid = transInfo["customer"]; 
+		var tripownerid = transInfo["tripowner"];
+		var locid = transInfo["location"]; 
 		var tripid = transInfo["trip"]; 
 		var tripRef = firebaseRef.child('trips/'+tripid); 
-		var userRef = firebaseRef.child('users/'+customerid); 
-		tripRef.once("value", function(snapshot) { 
-			var tripInfo = snapshot.val(); 
-			var locid = tripInfo["location"]; 
-			var toa = tripInfo["toa"]; 
-			var tripownerid = tripInfo["user"]; 
-			// remove transaction if the toa of the trip has passed, and the status is pending
-			if (toa < currentTime) { 
-			    if (status == "pending") { 
-				removeTransaction(transactionid, tripid, customerid, tripownerid); 
-				res.json({"status": "deleted"}); 
-			    }
-			} else {
-			    var locRef = firebaseRef.child('locations/'+locid); 
-			    locRef.once("value", function(snapshot) {
-				    var locInfo = snapshot.val(); 
-				    var locName = locInfo['name']; 
-				    userRef.once("value", function(snapshot) { 
-					    var userInfo = snapshot.val(); 
-					    var userName = userInfo["username"]; 
-					    res.json({"status": "success", "tripInfo": tripInfo, "locName": locName, "custName": userName, "transStatus": status}); 
-					}); 
+		var customerRef = firebaseRef.child('users/'+customerid); 
+		
+		var toa = transInfo["toa"];
+		if (toa < currentTime) { 
+		    // tripowner has arrived at location
+		    if (status == "pending" || status == "deferred") { 
+			// remove transaction if the toa of the trip has passed
+			removeTransaction(transactionid, tripid, customerid, tripownerid); 
+			res.json({"status": "deleted"}); 
+		    } else { 
+			//accepted trips D.T.R: other types
+			// send transaction info with tripInfo = null
+			var locRef = firebaseRef.child('locations/'+locid); 
+			locRef.once("value", function(snapshot) {
+				var locInfo = snapshot.val(); 
+				var locName = locInfo['name']; 
+				customerRef.once("value", function(snapshot) { 
+				    var custInfo = snapshot.val(); 
+				    var custName = custInfo["username"]; 
+				    var tripOwnerRef = firebaseRef.child('users/'+tripownerid); 
+				    tripOwnerRef.once("value", function(snapshot) { 
+					    var tripOwnerInfo = snapshot.val(); 
+					    var tripOwnerName = tripOwnerInfo["username"]; 
+					    res.json({"status": "success", "id": transactionid, 
+							"tripInfo": null, "toa": toa, "location": locid, "locName": locName, 
+							"custName": custName, "transStatus": status,
+							"tripOwnerName": tripOwnerName});
+					});  
+				    }); 
+			    });
+		    }
+		} else {
+		    // tripowner has not arrived at location
+		    var locRef = firebaseRef.child('locations/'+locid); 
+		    locRef.once("value", function(snapshot) {
+			    var locInfo = snapshot.val(); 
+			    var locName = locInfo['name']; 
+			    customerRef.once("value", function(snapshot) { 
+				    var custInfo = snapshot.val(); 
+				    var custName = custInfo["username"]; 
+				    var tripOwnerRef = firebaseRef.child('users/'+tripownerid); 
+				    tripOwnerRef.once("value", function(snapshot) { 
+					    var tripOwnerInfo = snapshot.val(); 
+					    var tripOwnerName = tripOwnerInfo["username"]; 
+					    var tripRef = firebaseRef.child('trips/'+tripid);
+					    tripRef.once("value", function(snapshot) { 
+						    var tripInfo = snapshot.val(); 
+						    res.json({"status": "success", "id": transactionid, 
+								"tripInfo": tripInfo, "toa": toa, "location": locid, "locName": locName, 
+								"custName": custName, "transStatus": status,
+								"tripOwnerName": tripOwnerName});
+						}); 
+					});
 				});
-			} 
-		    }); 
-	    }); 
+			});
+		}
+	    });
     }); 
 
 app.post('/deferTransaction', function(req, res) {
         var transactionid = req.body.transactionid;
 	var userid = req.body.userid; 
-        var userRef = firebaseRef.child('users/'+userid+'/transactions/responses/'+transactionid).set('deferred');
+        firebaseRef.child('users/'+userid+'/transactions/responses/'+transactionid).set('deferred');
+	// need to defer in other transaction locations as well
 	res.json({"status": "success"});
     }); 
 
@@ -137,7 +173,6 @@ app.post('/getbag', function(req, res) {
 		console.log(bagid); 
 		if (bags != null) {
 		    if (bagid in bags) {
-			console.log("what?"); 
 			var bag = bags[bagid];
 			var bagContents = bag["contents"];
 			console.log(bagContents); 
@@ -191,14 +226,12 @@ app.post('/pingUser', function (req, res) {
 	var bagContents = reqInfo.bagContents;
 	var senderRef = firebaseRef.child('users/'+userid);
 	var tripRef = firebaseRef.child('trips/'+tripid); 
-
-	// initiate a pending transaction
-	var transaction = {'customer': userid, 'trip': tripid, 'bagContents': bagContents, 'status': 'pending'};
 	
 	tripRef.once("value", function(snapshot) { 
 		var tripInfo = snapshot.val(); 
 		var locationid = tripInfo["location"];
 		var tripownerid = tripInfo["user"]; 
+		var toa = tripInfo["toa"]; 
 		var locRef = firebaseRef.child('locations/'+locationid); 
 		var userRef = firebaseRef.child('users/'+tripownerid); 
 		userRef.once("value", function(snapshot) { 
@@ -211,6 +244,9 @@ app.post('/pingUser', function (req, res) {
 			//locRef.child('transactions/'+transactionid).set('pending'); 
 			tripRef.child('transactions/'+transactionid).set('pending'); 
 			
+			// initiate a pending transaction
+			var transaction = {'customer': userid, 'tripowner': tripownerid, 'location': locationid, 'trip': tripid, 
+					   'toa': toa, 'bagContents': bagContents, 'status': 'pending'};
 			// update transactions folder with transaction
 			firebaseRef.child('transactions/'+transactionid).set(transaction); 
 
@@ -254,6 +290,7 @@ app.post('/pingUserAccept', function (req, res) {
 	transactionRef.once("value", function(snapshot) { 
 		var transInfo = snapshot.val(); 
 		var customerid = transInfo["customer"]; 
+		var tripid = transInfo["trip"];
 		transactionRef.child('status').set("accepted"); 
 		// will have to change the status of all the other pending transations the user may have for the same location!
 		// so that no more than one tripgoer serves the customer's need at that particular store, with his/her partic. bag
@@ -261,11 +298,13 @@ app.post('/pingUserAccept', function (req, res) {
 		customerRef.once("value", function(snapshot) { 
 			var custInfo = snapshot.val(); 
 			var deviceToken = custInfo["deviceToken"]; 
-			var tripRef = firebaseRef.child('trips/'+transInfo["trip"]);
+			var tripRef = firebaseRef.child('trips/'+tripid);
 			tripRef.once("value", function(snapshot) { 
 				var tripInfo = snapshot.val(); 
 				var locationid = tripInfo["location"]; 
 				var userid = tripInfo["user"]; 
+				// change status of transaction to ACCEPTED
+				changeTransactionStatus(transactionid, tripid, customerid, userid, 'accepted')
 				var locationRef = firebaseRef.child('locations/'+locationid); 
 				locationRef.once("value", function(snapshot) { 
 					var locInfo = snapshot.val(); 
@@ -275,7 +314,7 @@ app.post('/pingUserAccept', function (req, res) {
 						var userInfo = snapshot.val(); 
 						var userName = userInfo["username"]; 
 						// create notification and push 
-						var note = new apn.Notification();
+						/*						var note = new apn.Notification();
 						var device = new apn.Device(deviceToken);                    
 						note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
 						note.badge = 1;
@@ -283,10 +322,8 @@ app.post('/pingUserAccept', function (req, res) {
 						note.alert =  userName + ' is going to get what you needed from ' + locName + '!';
 						note.payload = {'messageFrom': userName, 'location': locName, 
 								'transactionid': transactionid}; 
-						//console.log(myDevice); 
-						//console.log(note); 
-						//console.log(options); 
 						apnConnection.pushNotification(note, device);
+						*/
 						res.json({"status": "success"});
 					    }); 
 				    }); 
@@ -294,7 +331,70 @@ app.post('/pingUserAccept', function (req, res) {
 		    }); 
 	    }); 
     }); 
-			
+
+app.post('/pingUserReject', function(req, res) { 
+	var reqInfo = req.body;
+	var transactionid = reqInfo.transactionid; 
+	var tripownerid = reqInfo.userid; 
+	var tripOwnerName = reqInfo.tripOwnerName; 
+	var locName = reqInfo.locName; 
+	var transactionRef = firebaseRef.child('transactions/'+transactionid); 
+	transactionRef.once("value", function(snapshot) { 
+		var transInfo = snapshot.val(); 
+		var customerid = transInfo["customer"];
+		var tripid = transInfo["trip"];
+		//transactionRef.child('status').set("accepted"); 
+		// remove transaction from database
+		removeTransaction(transactionid, tripid, customerid, tripownerid); 
+		var customerRef = firebaseRef.child('users/'+customerid);
+		customerRef.once("value", function(snapshot) { 
+			var custInfo = snapshot.val(); 
+			var deviceToken = custInfo["deviceToken"]; 
+			// create notification and push 
+			var note = new apn.Notification();
+			var device = new apn.Device(deviceToken);                    
+			note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+			note.badge = 1;
+			note.sound = "ping.aiff";
+			note.alert =  tripOwnerName + ' can\'t get what you needed from ' + locName + ', sorry!';
+			note.payload = {'messageFrom': tripOwnerName, 'location': locName, 
+					'transactionid': transactionid}; 
+			apnConnection.pushNotification(note, device);
+			res.json({"status": "success"});
+		    }); 
+	    }); 
+    }); 
+
+app.post('/pingUserDelivered', function(req, res) { 
+	var transactionid = req.body.transactionid; 
+	var tripownerid = req.body.userid; 
+	var tripOwnerName = req.body.tripOwnerName; 
+	var locName = req.body.locName; 
+	var transactionRef = firebaseRef.child('transactions/'+transactionid); 
+	transactionRef.once("value", function(snapshot) { 
+		var transInfo = snapshot.val(); 
+		var customerid = transInfo["customer"];
+		var tripid = transInfo["trip"];
+		changeTransactionStatus(transactionid, tripid, customerid, tripownerid, "delivered"); 
+		var customerRef = firebaseRef.child('users/'+customerid);
+		customerRef.once("value", function(snapshot) { 
+			var custInfo = snapshot.val(); 
+			var deviceToken = custInfo["deviceToken"]; 
+			// create notification and push 
+			var note = new apn.Notification();
+			var device = new apn.Device(deviceToken);                    
+			note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+			note.badge = 1;
+			note.sound = "ping.aiff";
+			note.alert =  tripOwnerName + ' has delivered what you needed from ' + locName + '.';
+			note.payload = {'messageFrom': tripOwnerName, 'location': locName, 
+					'transactionid': transactionid}; 
+			apnConnection.pushNotification(note, device);
+			res.json({"status": "success"});
+		    }); 
+	    }); 
+    }); 
+
 app.post('/postTrip', function(req, res) { 
 	var locid = req.body.locationid; 
 	var userid = req.body.userid; 
@@ -430,7 +530,14 @@ app.post('/removeTrip', function(req, res) {
 	 
     }); 
 
-
+function changeTransactionStatus(transactionid, tripid, customerid, tripownerid, statusType) { 
+    firebaseRef.child('transactions/'+transactionid+'/status').set(statusType);
+    firebaseRef.child('trips/'+tripid+'/transactions/'+transactionid).set(statusType); 
+    firebaseRef.child('users/'+customerid+'/transactions/requests/'+transactionid).set(statusType); 
+    firebaseRef.child('users/'+tripownerid+'/transactions/responses/'+transactionid).set(statusType); 
+}
+ 
+	
 
 function removeTransaction(transactionid, tripid, customerid, tripownerid) { 
     var transRef = firebaseRef.child('transactions/'+transactionid); 

@@ -13,13 +13,15 @@ class TransactionInfoViewController: UIViewController
     var curUser: String!
     var transactionInfo = [String: AnyObject]()
     var tripInfo = [String: AnyObject]()
+    var status: String! // status of request (pending/deferred, accepted, completed, paid)
     
     
     let urlsavebag = "http://localhost:3000/savebag"
     let urlgetbag = "http://localhost:3000/getbag"
     
-    @IBOutlet weak var pendingLine: UILabel!
+   
     @IBOutlet weak var userNameLabel: UILabel!
+    @IBOutlet weak var openingLineLabel: UILabel!
     @IBOutlet weak var arrivalTimeLabel: UILabel!
     @IBOutlet weak var minLabel: UILabel!
     @IBOutlet weak var bagLabel: UILabel!
@@ -27,7 +29,9 @@ class TransactionInfoViewController: UIViewController
     @IBOutlet weak var editBagButton: UIButton!
     @IBOutlet weak var saveBagButton: UIButton!
     @IBOutlet weak var bagContentsTextView: UITextView!
-   
+    @IBOutlet weak var pendingExtraInfo: UILabel!
+    @IBOutlet weak var acceptedLabel: UILabel!
+    @IBOutlet weak var actionType: UILabel!
     
     @IBAction func editBag(sender: UIButton) {
         sender.hidden = true
@@ -36,7 +40,15 @@ class TransactionInfoViewController: UIViewController
     }
     
     @IBAction func cancelTransaction(sender: OBShapedButton) {
-        
+    }
+    
+    
+    @IBAction func backToTransactions(sender: UIButton) {
+        let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+        let transVC:TransactionViewController = storyboard.instantiateViewControllerWithIdentifier("transactions") as TransactionViewController
+        transVC.curUser = self.curUser
+        transVC.getTransactions(self.curUser)
+        self.presentViewController(transVC, animated: false, completion: nil)
     }
     
     @IBAction func saveBag(sender: UIButton) {
@@ -78,13 +90,98 @@ class TransactionInfoViewController: UIViewController
         super.viewDidLoad()
         println(transactionInfo)
         self.tripInfo = self.transactionInfo["tripInfo"] as [String: AnyObject] //keys: locid, toa, typeoftrip, userid(trip owner)
-        if transactionInfo["request"] as Bool {
-            displayReqTransactionInfo()
-        } else {
-            displayResponseTransactionInfo()
+        displayReqTransactionInfo()
+    }
+    
+    func displayReqTransactionInfo() {
+        self.userNameLabel.text = self.transactionInfo["tripOwnerName"] as String!
+        var toa = tripInfo["toa"] as Int
+        let date = NSDate()
+        let timestamp = date.timeIntervalSince1970
+        toa = (toa - Int(ceil(timestamp)))
+        // display in minutes and round down
+        toa = Int(floor(Double(toa) / 60.0))
+        self.arrivalTimeLabel.text = "\(toa)"
+        if self.status == "pending" {
+            displayPendingReqTransaction()
+            displayTabHeader(self.status)
+        } else if self.status == "accepted" {
+            displayAcceptedReqTransaction()
+            displayTabHeader(self.status)
+        } else if self.status == "completed" {
+            displayCompletedReqTransaction()
         }
     }
     
+    func displayPendingReqTransaction() {
+        getBag()
+        
+
+        
+    }
+    
+    func displayAcceptedReqTransaction() {
+        getBag()
+        self.pendingExtraInfo.hidden = true
+        self.acceptedLabel.hidden = false
+        self.actionType.text = "Message"
+        self.actionType.sizeToFit()
+        self.actionType.textColor = UIColor.whiteColor()
+        self.saveBagButton.hidden = true
+        self.saveBagButton.enabled = false
+        self.editBagButton.hidden = true
+        self.editBagButton.enabled = false
+        self.openingLineLabel.text = "Order accepted by"
+        
+        
+    }
+    
+    func displayCompletedReqTransaction() {
+    
+    }
+
+    
+    // displays the transaction tab at the top of the view with the appropriate status details
+    func displayTabHeader(status: String!) {
+        var transactionTab = OBShapedButton.buttonWithType(UIButtonType.Custom) as OBShapedButton
+        transactionTab.frame = CGRectMake(10, 30, 278, 45)
+        transactionTab.center.x = self.view.center.x
+        transactionTab.alpha = 0.8
+        self.view.addSubview(transactionTab)
+        var locLabel = UILabel()
+        transactionTab.addSubview(locLabel)
+        var locName = transactionInfo["locName"] as String!
+        locName.replaceRange(locName.startIndex...locName.startIndex, with: String(locName[locName.startIndex]).capitalizedString)
+        locLabel.text = locName
+        locLabel.font = UIFont(name: "Futura", size: 11)
+        locLabel.textColor = UIColor.whiteColor()
+        locLabel.sizeToFit()
+        var tabSize = transactionTab.frame.size
+        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/8), y: tabSize.height/2)
+        var nameLabel = UILabel()
+        transactionTab.addSubview(nameLabel)
+        nameLabel.text = transactionInfo["tripOwnerName"] as String!
+        nameLabel.font = UIFont(name: "Futura", size: 11)
+        nameLabel.textColor = UIColor.whiteColor()
+        nameLabel.sizeToFit()
+        nameLabel.center = CGPoint(x: tabSize.width/2, y: tabSize.height/2)
+        var statusLabel = UILabel()
+        transactionTab.addSubview(statusLabel)
+        var transTab: UIImage!
+        if status == "pending" || status == "deferred" {
+            transTab = UIImage(named: "tab")!
+            statusLabel.text = "P"
+            statusLabel.textColor = UIColor.whiteColor()
+        } else if (status == "accepted") {
+            transTab = UIImage(named: "tabgreen")!
+            statusLabel.text = "Accepted!"
+            statusLabel.textColor = UIColor.greenColor()
+        }
+        transactionTab.setImage(transTab, forState: UIControlState.Normal)
+        statusLabel.font = UIFont(name: "Futura", size: 11)
+        statusLabel.sizeToFit()
+        statusLabel.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
+    }
     
     func getBag() {
         var bagInfo = ["userid": self.curUser, "locationid": tripInfo["location"] as String]
@@ -113,67 +210,6 @@ class TransactionInfoViewController: UIViewController
         })
         
         serverTask.resume()
-    }
-    
-    func displayReqTransactionInfo() {
-        var transactionTab = OBShapedButton.buttonWithType(UIButtonType.Custom) as OBShapedButton
-        transactionTab.frame = CGRectMake(10, 30, 278, 45)
-        transactionTab.center.x = self.view.center.x
-        var status = transactionInfo["transStatus"] as String
-        if status == "pending" {
-            displayPendingReqTransaction(transactionTab)
-        } else if status == "accepted" {
-            displayAcceptedReqTransaction()
-        } else if status == "completed" {
-            displayCompletedReqTransaction()
-        }
-    }
-    
-    func displayPendingReqTransaction(transactionTab: OBShapedButton) {
-        getBag()
-        println("should be showing")
-        var transTab = UIImage(named: "tab")
-        println(transTab)
-        transactionTab.setImage(transTab, forState: UIControlState.Normal)
-        transactionTab.alpha = 0.8
-        self.view.addSubview(transactionTab)
-        var locLabel = UILabel()
-        transactionTab.addSubview(locLabel)
-        var locName = transactionInfo["locName"] as String!
-        locName.replaceRange(locName.startIndex...locName.startIndex, with: String(locName[locName.startIndex]).capitalizedString)
-        locLabel.text = locName
-        locLabel.font = UIFont(name: "Futura", size: 11)
-        locLabel.textColor = UIColor.whiteColor()
-        locLabel.sizeToFit()
-        var tabSize = transactionTab.frame.size
-        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/8), y: tabSize.height/2)
-        var nameLabel = UILabel()
-        transactionTab.addSubview(nameLabel)
-        nameLabel.text = transactionInfo["custName"] as String!
-        nameLabel.font = UIFont(name: "Futura", size: 11)
-        nameLabel.textColor = UIColor.whiteColor()
-        nameLabel.sizeToFit()
-        nameLabel.center = CGPoint(x: tabSize.width/2, y: tabSize.height/2)
-        var statusLabel = UILabel()
-        transactionTab.addSubview(statusLabel)
-        statusLabel.text = "P"
-        statusLabel.font = UIFont(name: "Futura", size: 11)
-        statusLabel.textColor = UIColor.whiteColor()
-        statusLabel.sizeToFit()
-        statusLabel.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
-        println(transactionTab)
-    }
-    
-    func displayAcceptedReqTransaction() {
-        
-    }
-    
-    func displayCompletedReqTransaction() {
-    
-    }
-
-    func displayResponseTransactionInfo() {
-    
     }
     
 }

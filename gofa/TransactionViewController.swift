@@ -19,7 +19,7 @@ class TransactionViewController: UIViewController {
     
     let urlgettransactions = "http://localhost:3000/getTransactions"
     let urlgettransactioninfo = "http://localhost:3000/getTransactionInfo"
-
+    let urlpinguseraccept = "http://localhost:3000/pingUserAccept"
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var noTransactions: UILabel!
@@ -27,10 +27,12 @@ class TransactionViewController: UIViewController {
     
     @IBOutlet weak var reqTransactionsView: UIView!
     
-    
-    
     func touchTransactionTab(sender: OBShapedButton) {
         performSegueWithIdentifier("goto_transactioninfo", sender: sender)
+    }
+
+    func touchTransactionResponseTab(sender: OBShapedButton) {
+        performSegueWithIdentifier("goto_transactionresponseinfo", sender: sender)
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -38,9 +40,24 @@ class TransactionViewController: UIViewController {
             var transactionInfoVC = TransactionInfoViewController()
             transactionInfoVC = segue.destinationViewController as TransactionInfoViewController
             var transTab = sender as OBShapedButton
+            var transactionInfo = transactions[transTab.tag] as [String: AnyObject]
+            var status = transactionInfo["transStatus"] as String
+            transactionInfoVC.status = status
             transactionInfoVC.curUser = self.curUser
-            transactionInfoVC.transactionInfo = transactions[transTab.tag] as [String: AnyObject]
+            transactionInfoVC.transactionInfo = transactionInfo
         }
+        if segue.identifier == "goto_transactionresponseinfo" {
+            var transactionInfoVC = TransactionInfoResponseViewController()
+            transactionInfoVC = segue.destinationViewController as TransactionInfoResponseViewController
+            var transTab = sender as OBShapedButton
+            var transactionInfo = transactions[transTab.tag] as [String: AnyObject]
+            var status = transactionInfo["transStatus"] as String
+            println(transactionInfo)
+            transactionInfoVC.status = status
+            transactionInfoVC.curUser = self.curUser
+            transactionInfoVC.transactionInfo = transactionInfo
+        }
+
     }
 
     @IBAction func backToHome(sender: UIButton) {
@@ -50,7 +67,48 @@ class TransactionViewController: UIViewController {
     }
     
     func acceptRequest(sender: UIButton) {
+        var transTab = sender.superview as OBShapedButton
+        var transaction = transactions[transTab.tag]
+        var requestInfo:NSDictionary = ["transactionid": transaction["id"] as String!, "userid": self.curUser as String!]
+        var acceptData = NSJSONSerialization.dataWithJSONObject(requestInfo,
+            options:NSJSONWritingOptions.allZeros, error: nil)
         
+        let url = NSURL(string: urlpinguseraccept)
+        let req = NSMutableURLRequest(URL: url!)
+        req.HTTPMethod = "POST"
+        req.HTTPBody = acceptData
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: config);
+        
+        let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+            if (error == nil) {
+                var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+                var status = feedback["status"] as String!
+                if (status == "success") {
+                    println("successfully sent acceptance of request to" + (requestInfo["userid"] as String!))
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        var tabAccepted = UIImage(named: "tabgreen")
+                        transTab.setImage(tabAccepted, forState: UIControlState.Normal)
+                        sender.hidden = true
+                        var acceptedLabel = UILabel()
+                        transTab.addSubview(acceptedLabel)
+                        acceptedLabel.text = "Accepted!"
+                        acceptedLabel.font = UIFont(name: "Futura", size: 11)
+                        acceptedLabel.textColor = UIColor.greenColor()
+                        acceptedLabel.sizeToFit()
+                        var tabSize = transTab.frame.size
+                        acceptedLabel.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
+                    })
+                }
+            } else {
+                println(error)
+                println("nope")
+            }
+        })
+        
+        serverTask.resume()
+
     }
     
     override func viewDidLoad() {
@@ -97,7 +155,6 @@ class TransactionViewController: UIViewController {
         super.viewWillAppear(true)
  
     }
-    
     
     // gets the transactions of 'user' from Firebase, and then calls getTransactionInfo() for all the transactions
     func getTransactions(user: String!) {
@@ -152,7 +209,6 @@ class TransactionViewController: UIViewController {
     
     // gets transaction info of transactionid, updates these transactions depending on toa and status, and calls displayReqTransactionTab or displayResTransactionTab for all the relevant transactions (that weren't deleted in server code)
     func getTransactionInfo(transactionid: String!, request: Bool) {
-        println("get*****************")
         var requestInfo:NSDictionary = ["transactionid": transactionid]
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
@@ -166,10 +222,7 @@ class TransactionViewController: UIViewController {
         let session = NSURLSession(configuration: config);
         let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
             if (error == nil) {
-                println("the data..")
-                println(data)
                 var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
-                //println(feedback)
                 var status = feedback["status"] as String!
                 if (status == "success") {
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
@@ -216,30 +269,13 @@ class TransactionViewController: UIViewController {
         var yheight = reqCount*50 + 100 // tabs have 5 units between each other
         transactionTab.frame = CGRectMake(10, CGFloat(yheight), 278, 45)
         transactionTab.center.x = self.view.center.x
+        var tabSize = transactionTab.frame.size
         var status = transactionInfo["transStatus"] as String
         if status == "pending" {
             var transTab = UIImage(named: "tab")
             transactionTab.setImage(transTab, forState: UIControlState.Normal)
             transactionTab.alpha = 0.8
             self.view.addSubview(transactionTab)
-            transactionTab.addTarget(self, action: "touchTransactionTab:", forControlEvents: UIControlEvents.TouchUpInside)
-            var locLabel = UILabel()
-            transactionTab.addSubview(locLabel)
-            var locName = transactionInfo["locName"] as String!
-            locName.replaceRange(locName.startIndex...locName.startIndex, with: String(locName[locName.startIndex]).capitalizedString)
-            locLabel.text = locName
-            locLabel.font = UIFont(name: "Futura", size: 11)
-            locLabel.textColor = UIColor.whiteColor()
-            locLabel.sizeToFit()
-            var tabSize = transactionTab.frame.size
-            locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/8), y: tabSize.height/2)
-            var nameLabel = UILabel()
-            transactionTab.addSubview(nameLabel)
-            nameLabel.text = transactionInfo["custName"] as String!
-            nameLabel.font = UIFont(name: "Futura", size: 11)
-            nameLabel.textColor = UIColor.whiteColor()
-            nameLabel.sizeToFit()
-            nameLabel.center = CGPoint(x: tabSize.width/2, y: tabSize.height/2)
             var statusLabel = UILabel()
             transactionTab.addSubview(statusLabel)
             statusLabel.text = "P"
@@ -247,10 +283,40 @@ class TransactionViewController: UIViewController {
             statusLabel.textColor = UIColor.whiteColor()
             statusLabel.sizeToFit()
             statusLabel.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
-            println(transactionTab)
-            activityIndicator.stopAnimating()
-            activityIndicator.hidden = true
         }
+        if status == "accepted" {
+            var transTab = UIImage(named: "tabgreen")
+            transactionTab.setImage(transTab, forState: UIControlState.Normal)
+            transactionTab.alpha = 0.8
+            self.view.addSubview(transactionTab)
+            var statusLabel = UILabel()
+            transactionTab.addSubview(statusLabel)
+            statusLabel.text = "Accepted!"
+            statusLabel.font = UIFont(name: "Futura", size: 11)
+            statusLabel.textColor = UIColor.greenColor()
+            statusLabel.sizeToFit()
+            statusLabel.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
+        }
+        transactionTab.addTarget(self, action: "touchTransactionTab:", forControlEvents: UIControlEvents.TouchUpInside)
+        var locLabel = UILabel()
+        transactionTab.addSubview(locLabel)
+        var locName = transactionInfo["locName"] as String!
+        locName.replaceRange(locName.startIndex...locName.startIndex, with: String(locName[locName.startIndex]).capitalizedString)
+        locLabel.text = locName
+        locLabel.font = UIFont(name: "Futura", size: 11)
+        locLabel.textColor = UIColor.whiteColor()
+        locLabel.sizeToFit()
+        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/8), y: tabSize.height/2)
+        var nameLabel = UILabel()
+        transactionTab.addSubview(nameLabel)
+        nameLabel.text = transactionInfo["tripOwnerName"] as String!
+        nameLabel.font = UIFont(name: "Futura", size: 11)
+        nameLabel.textColor = UIColor.whiteColor()
+        nameLabel.sizeToFit()
+        nameLabel.center = CGPoint(x: tabSize.width/2, y: tabSize.height/2)
+        activityIndicator.stopAnimating()
+        activityIndicator.hidden = true
+
         reqCount = reqCount + 1
     }
     
@@ -265,6 +331,7 @@ class TransactionViewController: UIViewController {
         var yheight = resCount*50 + 320 // tabs have 5 units between each other
         transactionTab.frame = CGRectMake(10, CGFloat(yheight), 278, 45)
         transactionTab.center.x = self.view.center.x
+        var tabSize = transactionTab.frame.size
         var status = transactionInfo["transStatus"] as String
         if status == "pending" || status == "deferred" {
             println(status)
@@ -272,24 +339,6 @@ class TransactionViewController: UIViewController {
             transactionTab.setImage(transTab, forState: UIControlState.Normal)
             transactionTab.alpha = 0.8
             self.view.addSubview(transactionTab)
-            transactionTab.addTarget(self, action: "touchTransactionTab:", forControlEvents: UIControlEvents.TouchUpInside)
-            var locLabel = UILabel()
-            transactionTab.addSubview(locLabel)
-            var locName = transactionInfo["locName"] as String!
-            locName.replaceRange(locName.startIndex...locName.startIndex, with: String(locName[locName.startIndex]).capitalizedString)
-            locLabel.text = locName
-            locLabel.font = UIFont(name: "Futura", size: 11)
-            locLabel.textColor = UIColor.whiteColor()
-            locLabel.sizeToFit()
-            var tabSize = transactionTab.frame.size
-            locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/8), y: tabSize.height/2)
-            var nameLabel = UILabel()
-            transactionTab.addSubview(nameLabel)
-            nameLabel.text = transactionInfo["custName"] as String!
-            nameLabel.font = UIFont(name: "Futura", size: 11)
-            nameLabel.textColor = UIColor.whiteColor()
-            nameLabel.sizeToFit()
-            nameLabel.center = CGPoint(x: tabSize.width/2, y: tabSize.height/2)
             var acceptButton   = UIButton.buttonWithType(UIButtonType.System) as UIButton
             acceptButton.frame = CGRectMake(5, 5, 50, 35)
             transactionTab.addSubview(acceptButton)
@@ -301,11 +350,41 @@ class TransactionViewController: UIViewController {
             acceptButton.backgroundColor = UIColor.whiteColor()
             acceptButton.layer.cornerRadius = 5
             acceptButton.addTarget(self, action: "acceptRequest:", forControlEvents: UIControlEvents.TouchUpInside)
-            println(acceptButton)
-            println(transactionTab)
-            activityIndicator.stopAnimating()
-            activityIndicator.hidden = true
         }
+        if status == "accepted" {
+            var transTab = UIImage(named: "tabgreen")
+            transactionTab.setImage(transTab, forState: UIControlState.Normal)
+            transactionTab.alpha = 0.8
+            self.view.addSubview(transactionTab)
+            var statusLabel = UILabel()
+            transactionTab.addSubview(statusLabel)
+            statusLabel.text = "Accepted!"
+            statusLabel.font = UIFont(name: "Futura", size: 11)
+            statusLabel.textColor = UIColor.greenColor()
+            statusLabel.sizeToFit()
+            statusLabel.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
+        }
+        transactionTab.addTarget(self, action: "touchTransactionResponseTab:", forControlEvents: UIControlEvents.TouchUpInside)
+        var locLabel = UILabel()
+        transactionTab.addSubview(locLabel)
+        var locName = transactionInfo["locName"] as String!
+        locName.replaceRange(locName.startIndex...locName.startIndex, with: String(locName[locName.startIndex]).capitalizedString)
+        locLabel.text = locName
+        locLabel.font = UIFont(name: "Futura", size: 11)
+        locLabel.textColor = UIColor.whiteColor()
+        locLabel.sizeToFit()
+        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/8), y: tabSize.height/2)
+        var nameLabel = UILabel()
+        transactionTab.addSubview(nameLabel)
+        nameLabel.text = transactionInfo["custName"] as String!
+        nameLabel.font = UIFont(name: "Futura", size: 11)
+        nameLabel.textColor = UIColor.whiteColor()
+        nameLabel.sizeToFit()
+        nameLabel.center = CGPoint(x: tabSize.width/2, y: tabSize.height/2)
+        activityIndicator.stopAnimating()
+        activityIndicator.hidden = true
+
+
         resCount = resCount + 1
     }
     
