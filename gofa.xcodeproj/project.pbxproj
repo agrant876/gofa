@@ -38,6 +38,7 @@
 		AD7D8ECD1A81837F008E400D /* UserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7D8ECC1A81837F008E400D /* UserViewController.swift */; };
 		AD863BC81ABCF68F00960AC4 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD863BC71ABCF68F00960AC4 /* LocationManager.swift */; };
 		ADB330D41AD1FB0900D77DFA /* TransactionInfoResponseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB330D31AD1FB0900D77DFA /* TransactionInfoResponseViewController.swift */; };
+		ADB954AF1AD232F50008BDDD /* PayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB954AE1AD232F50008BDDD /* PayViewController.swift */; };
 		ADC026221ABA2EDB00B265B1 /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC026211ABA2EDB00B265B1 /* NotificationViewController.swift */; };
 		ADC1BAA41A7C472900235B09 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC1BAA31A7C472900235B09 /* LoginViewController.swift */; };
 		ADC1BAA81A7C498D00235B09 /* SignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC1BAA71A7C498D00235B09 /* SignupViewController.swift */; };
@@ -96,6 +97,7 @@
 		AD7D8ECC1A81837F008E400D /* UserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserViewController.swift; path = ../UserViewController.swift; sourceTree = "<group>"; };
 		AD863BC71ABCF68F00960AC4 /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ADB330D31AD1FB0900D77DFA /* TransactionInfoResponseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionInfoResponseViewController.swift; sourceTree = "<group>"; };
+		ADB954AE1AD232F50008BDDD /* PayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayViewController.swift; sourceTree = "<group>"; };
 		ADC026211ABA2EDB00B265B1 /* NotificationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
 		ADC1BAA31A7C472900235B09 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		ADC1BAA71A7C498D00235B09 /* SignupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SignupViewController.swift; path = ../SignupViewController.swift; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				AD1A6DF11A79D6CF009B9F31 /* Main.storyboard */,
+				ADB954AE1AD232F50008BDDD /* PayViewController.swift */,
 				ADB330D31AD1FB0900D77DFA /* TransactionInfoResponseViewController.swift */,
 				AD1A6DED1A79D6CF009B9F31 /* AppDelegate.swift */,
 				AD5407221ACB04920067E653 /* TransactionInfoViewController.swift */,
@@ -398,6 +401,7 @@
 				ADC1BAA81A7C498D00235B09 /* SignupViewController.swift in Sources */,
 				AD1A6DEE1A79D6CF009B9F31 /* AppDelegate.swift in Sources */,
 				AD1589D41A7E98AE00DBC68A /* UIImage+ColorAtPixel.m in Sources */,
+				ADB954AF1AD232F50008BDDD /* PayViewController.swift in Sources */,
 				AD037D631A90986F00DA4BA0 /* BagViewController.swift in Sources */,
 				AD2AADAC1A814AFB00FFA416 /* Trip.swift in Sources */,
 			);

@@ -12,7 +12,6 @@ class TransactionInfoViewController: UIViewController
 {
     var curUser: String!
     var transactionInfo = [String: AnyObject]()
-    var tripInfo = [String: AnyObject]()
     var status: String! // status of request (pending/deferred, accepted, completed, paid)
     
     
@@ -56,7 +55,7 @@ class TransactionInfoViewController: UIViewController
         editBagButton.hidden = true
         bagContentsTextView.endEditing(true)
         var bagContents = bagContentsTextView.text;
-        var bagInfo = ["contents": bagContents, "userid": self.curUser, "locationid": self.tripInfo["location"] as String]
+        var bagInfo = ["contents": bagContents, "userid": self.curUser, "locationid": self.transactionInfo["location"] as String]
         var bagData = NSJSONSerialization.dataWithJSONObject(bagInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
         let url = NSURL(string: urlsavebag)
@@ -89,13 +88,12 @@ class TransactionInfoViewController: UIViewController
     override func viewDidLoad() {
         super.viewDidLoad()
         println(transactionInfo)
-        self.tripInfo = self.transactionInfo["tripInfo"] as [String: AnyObject] //keys: locid, toa, typeoftrip, userid(trip owner)
         displayReqTransactionInfo()
     }
     
     func displayReqTransactionInfo() {
         self.userNameLabel.text = self.transactionInfo["tripOwnerName"] as String!
-        var toa = tripInfo["toa"] as Int
+        var toa = self.transactionInfo["toa"] as Int
         let date = NSDate()
         let timestamp = date.timeIntervalSince1970
         toa = (toa - Int(ceil(timestamp)))
@@ -184,7 +182,7 @@ class TransactionInfoViewController: UIViewController
     }
     
     func getBag() {
-        var bagInfo = ["userid": self.curUser, "locationid": tripInfo["location"] as String]
+        var bagInfo = ["userid": self.curUser, "locationid": transactionInfo["location"] as String]
         var bagData = NSJSONSerialization.dataWithJSONObject(bagInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
         let url = NSURL(string: urlgetbag)

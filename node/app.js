@@ -90,7 +90,7 @@ app.post('/getTransactionInfo', function(req, res) {
 			removeTransaction(transactionid, tripid, customerid, tripownerid); 
 			res.json({"status": "deleted"}); 
 		    } else { 
-			//accepted trips D.T.R: other types
+			//accepted or delivered trips D.T.R: other types
 			// send transaction info with tripInfo = null
 			var locRef = firebaseRef.child('locations/'+locid); 
 			locRef.once("value", function(snapshot) {
@@ -102,11 +102,13 @@ app.post('/getTransactionInfo', function(req, res) {
 				    var tripOwnerRef = firebaseRef.child('users/'+tripownerid); 
 				    tripOwnerRef.once("value", function(snapshot) { 
 					    var tripOwnerInfo = snapshot.val(); 
-					    var tripOwnerName = tripOwnerInfo["username"]; 
+					    var tripOwnerName = tripOwnerInfo["username"];
+					    var tripOwnerEmail = tripOwnerInfo["email"]; 
 					    res.json({"status": "success", "id": transactionid, 
 							"tripInfo": null, "toa": toa, "location": locid, "locName": locName, 
 							"custName": custName, "transStatus": status,
-							"tripOwnerName": tripOwnerName});
+							"tripOwnerName": tripOwnerName, "tripOwnerEmail": tripOwnerEmail,
+							"tripOwnerId": tripownerid});
 					});  
 				    }); 
 			    });
@@ -124,13 +126,15 @@ app.post('/getTransactionInfo', function(req, res) {
 				    tripOwnerRef.once("value", function(snapshot) { 
 					    var tripOwnerInfo = snapshot.val(); 
 					    var tripOwnerName = tripOwnerInfo["username"]; 
+					    var tripOwnerEmail = tripOwnerInfo["email"]; 
 					    var tripRef = firebaseRef.child('trips/'+tripid);
 					    tripRef.once("value", function(snapshot) { 
 						    var tripInfo = snapshot.val(); 
 						    res.json({"status": "success", "id": transactionid, 
 								"tripInfo": tripInfo, "toa": toa, "location": locid, "locName": locName, 
 								"custName": custName, "transStatus": status,
-								"tripOwnerName": tripOwnerName});
+								"tripOwnerName": tripOwnerName, "tripOwnerEmail": tripOwnerEmail,
+								"tripOwnerId": tripownerid});
 						}); 
 					});
 				});
@@ -165,7 +169,7 @@ app.post('/savebag', function(req, res) {
 
 app.post('/getbag', function(req, res) {
 	var bagInfo = req.body; 
-	var bagid = bagInfo.locationid+':'+bagInfo.userid;
+	var bagid = bagInfo.locationid+'_'+bagInfo.userid;
 	var bagRef = firebaseRef.child('bags'); 
 	bagRef.once("value", function(snapshot) { 
 		var bags = snapshot.val(); 

@@ -57,13 +57,26 @@ class TransactionViewController: UIViewController {
             transactionInfoVC.curUser = self.curUser
             transactionInfoVC.transactionInfo = transactionInfo
         }
-
+        if segue.identifier == "goto_pay" {
+            var payVC = PayViewController()
+            payVC = segue.destinationViewController as PayViewController
+            var payButton = sender as UIButton
+            var transTab = payButton.superview as OBShapedButton
+            var transactionInfo = transactions[transTab.tag] as [String: AnyObject]
+            payVC.transactionInfo = transactionInfo
+            payVC.curUser = self.curUser
+        }
     }
 
     @IBAction func backToHome(sender: UIButton) {
         let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
         let VC:ViewController = storyboard.instantiateViewControllerWithIdentifier("home") as ViewController
         self.presentViewController(VC, animated: false, completion: nil)
+    }
+    
+    // present controller to pay for transaction
+    func goToPay(sender: UIButton) {
+        performSegueWithIdentifier("goto_pay", sender: sender)
     }
     
     func acceptRequest(sender: UIButton) {
@@ -291,11 +304,28 @@ class TransactionViewController: UIViewController {
             self.view.addSubview(transactionTab)
             var statusLabel = UILabel()
             transactionTab.addSubview(statusLabel)
-            statusLabel.text = "Accepted!"
+            statusLabel.text = "Accepted"
             statusLabel.font = UIFont(name: "Futura", size: 11)
             statusLabel.textColor = UIColor.greenColor()
             statusLabel.sizeToFit()
             statusLabel.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
+        }
+        if status == "delivered" {
+            var transTab = UIImage(named: "tabgreen")
+            transactionTab.setImage(transTab, forState: UIControlState.Normal)
+            transactionTab.alpha = 0.8
+            self.view.addSubview(transactionTab)
+            var payButton   = UIButton.buttonWithType(UIButtonType.System) as UIButton
+            payButton.frame = CGRectMake(5, 5, 35, 25)
+            transactionTab.addSubview(payButton)
+            payButton.setTitle("Pay", forState: UIControlState.Normal)
+            payButton.titleLabel?.font = UIFont(name: "Futura", size: 11)
+            payButton.titleLabel?.sizeToFit()
+            payButton.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
+            // acceptButton.titleLabel?.textColor = UIColor.whiteColor()
+            payButton.backgroundColor = UIColor.whiteColor()
+            payButton.layer.cornerRadius = 5
+            payButton.addTarget(self, action: "goToPay:", forControlEvents: UIControlEvents.TouchUpInside)
         }
         transactionTab.addTarget(self, action: "touchTransactionTab:", forControlEvents: UIControlEvents.TouchUpInside)
         var locLabel = UILabel()

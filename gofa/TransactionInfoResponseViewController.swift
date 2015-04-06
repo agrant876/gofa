@@ -64,7 +64,7 @@ class TransactionInfoResponseViewController: UIViewController
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        println(transactionInfo)
+        //println(transactionInfo)
         /*if let tinfo = self.transactionInfo["tripInfo"] as [String: AnyObject]? {
             self.tripInfo = tinfo //keys: locid, toa, typeoftrip, userid(trip owner)
         }*/
@@ -92,6 +92,7 @@ class TransactionInfoResponseViewController: UIViewController
             displayTabHeader(self.status)
         } else if self.status == "completed" {
             displayDeliveredResTransaction()
+            displayTabHeader(self.status)
         }
     }
     
@@ -154,11 +155,15 @@ class TransactionInfoResponseViewController: UIViewController
         var transTab: UIImage!
         if status == "pending" || status == "deferred" {
             transTab = UIImage(named: "tab")!
-            statusLabel.text = "P"
+            statusLabel.text = "Pending"
             statusLabel.textColor = UIColor.whiteColor()
         } else if (status == "accepted") {
             transTab = UIImage(named: "tabgreen")!
-            statusLabel.text = "Accepted!"
+            statusLabel.text = "Accepted"
+            statusLabel.textColor = UIColor.greenColor()
+        } else if (status == "delivered") {
+            transTab = UIImage(named: "tabgreen")!
+            statusLabel.text = "Delivered"
             statusLabel.textColor = UIColor.greenColor()
         }
         transactionTab.setImage(transTab, forState: UIControlState.Normal)
