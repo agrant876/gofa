@@ -14,11 +14,10 @@ class TransactionInfoViewController: UIViewController
     var transactionInfo = [String: AnyObject]()
     var status: String! // status of request (pending/deferred, accepted, completed, paid)
     
+    let urlkind = "gofa-app.com"
+    var urlsavebag: String!
+    var urlgetbag: String!
     
-    let urlsavebag = "http://localhost:3000/savebag"
-    let urlgetbag = "http://localhost:3000/getbag"
-    
-   
     @IBOutlet weak var userNameLabel: UILabel!
     @IBOutlet weak var openingLineLabel: UILabel!
     @IBOutlet weak var arrivalTimeLabel: UILabel!
@@ -32,9 +31,14 @@ class TransactionInfoViewController: UIViewController
     @IBOutlet weak var acceptedLabel: UILabel!
     @IBOutlet weak var actionType: UILabel!
     
+    @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
+        bagContentsTextView.endEditing(true)
+    }
+    
     @IBAction func editBag(sender: UIButton) {
         sender.hidden = true
         saveBagButton.hidden = false
+        bagContentsTextView.editable = true
         bagContentsTextView.becomeFirstResponder()
     }
     
@@ -46,14 +50,14 @@ class TransactionInfoViewController: UIViewController
         let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
         let transVC:TransactionViewController = storyboard.instantiateViewControllerWithIdentifier("transactions") as TransactionViewController
         transVC.curUser = self.curUser
-        transVC.getTransactions(self.curUser)
         self.presentViewController(transVC, animated: false, completion: nil)
     }
     
     @IBAction func saveBag(sender: UIButton) {
         sender.hidden = true
-        editBagButton.hidden = true
+        editBagButton.hidden = false
         bagContentsTextView.endEditing(true)
+        bagContentsTextView.editable = false
         var bagContents = bagContentsTextView.text;
         var bagInfo = ["contents": bagContents, "userid": self.curUser, "locationid": self.transactionInfo["location"] as String]
         var bagData = NSJSONSerialization.dataWithJSONObject(bagInfo,
@@ -87,6 +91,8 @@ class TransactionInfoViewController: UIViewController
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.urlsavebag = "http://" + urlkind + "/savebag"
+        self.urlgetbag = "http://" + urlkind + "/getbag"
         println(transactionInfo)
         displayReqTransactionInfo()
     }
@@ -106,15 +112,13 @@ class TransactionInfoViewController: UIViewController
         } else if self.status == "accepted" {
             displayAcceptedReqTransaction()
             displayTabHeader(self.status)
-        } else if self.status == "completed" {
+        } else if self.status == "delivered" {
             displayCompletedReqTransaction()
         }
     }
     
     func displayPendingReqTransaction() {
         getBag()
-        
-
         
     }
     

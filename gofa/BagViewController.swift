@@ -21,14 +21,13 @@ class BagViewController: UIViewController, UITextViewDelegate {
     var locationDict = [String: AnyObject]()
     var bagContents: String?
     
-    
-    let urlsavebag = "http://localhost:3000/savebag"
-    let urlgetbag = "http://localhost:3000/getbag"
+    let urlkind = "gofa-app.com"
+    var urlsavebag: String!
+    var urlgetbag: String!
     
     @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
         bagTextView.endEditing(true)
     }
-    
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
@@ -41,6 +40,8 @@ class BagViewController: UIViewController, UITextViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.urlsavebag = "http://" + urlkind + "/savebag"
+        self.urlgetbag = "http://" + urlkind + "/getbag"
         bagTextView.delegate = self
         self.placeholderLabel.hidden = true
         self.activityIndicator.startAnimating()

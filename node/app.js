@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var Firebase = require('firebase'); 
 
 var app = express();
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 80);
 
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: true }));
@@ -17,9 +17,6 @@ var firebaseRef = new Firebase('https://gofa.firebaseio.com/')
 var options = { };
 var apnConnection = new apn.Connection(options);
 
-
-
-
 //res.send('Hey there iphone!');
 
 	/*
@@ -27,7 +24,9 @@ var apnConnection = new apn.Connection(options);
 	    return res.sendStatus(400);
 	    }*/
 	
-
+app.get('/', function(req, res){
+	res.send('hello world');
+    });
 
 
 // sending to my iphone 
@@ -39,22 +38,27 @@ app.post('/unseenNotif', function(req, res) {
 	var userRef = firebaseRef.child('users/'+userid); 
 	userRef.once("value", function(snapshot) { 
 		var userInfo = snapshot.val(); 	
+	       	var pendingTrans = []; // array of pending transactions (ids) to return
 		if ('transactions' in userInfo) { 
 		    var transactions = userInfo["transactions"];
 		    if('responses' in transactions) { 
 			var respTransactions = transactions["responses"]; 
-			console.log("1");
-			//var retTrans = []; // array of transaction dictionaries to return
-			console.log(respTransactions); 
 			for (key in respTransactions) {
-			    console.log("2"); 
 			    if (respTransactions[key] == 'pending') { 
-				console.log("3"); 
-				var transactionRef = firebaseRef.child('transactions/'+key); 
+				pendingTrans.push(key);
+			    }
+			}
+		    }
+		}
+		res.json({"pendingTrans": pendingTrans}); 
+	    });
+    });
+	
+/*	var transactionRef = firebaseRef.child('transactions/'+key); 
+		
 				transactionRef.once("value", function(snapshot) { 
 					var transactionInfo = snapshot.val();
 					transactionInfo["id"] = key;
-					console.log("I was called!"); 
 					res.json({"transaction": transactionInfo, "hasNotif": "true"});
 				    });
 			    } else { 
@@ -66,7 +70,7 @@ app.post('/unseenNotif', function(req, res) {
 		    res.json({"transaction": null, "hasNotif": "false"}); 
 		}
 	    });
-    });
+	    });*/
 
 app.post('/getTransactionInfo', function(req, res) { 
 	var transactionid = req.body.transactionid; 
@@ -79,9 +83,10 @@ app.post('/getTransactionInfo', function(req, res) {
 		var tripownerid = transInfo["tripowner"];
 		var locid = transInfo["location"]; 
 		var tripid = transInfo["trip"]; 
+		var userLoc = transInfo["userLoc"];
 		var tripRef = firebaseRef.child('trips/'+tripid); 
 		var customerRef = firebaseRef.child('users/'+customerid); 
-		
+
 		var toa = transInfo["toa"];
 		if (toa < currentTime) { 
 		    // tripowner has arrived at location
@@ -108,7 +113,7 @@ app.post('/getTransactionInfo', function(req, res) {
 							"tripInfo": null, "toa": toa, "location": locid, "locName": locName, 
 							"custName": custName, "transStatus": status,
 							"tripOwnerName": tripOwnerName, "tripOwnerEmail": tripOwnerEmail,
-							"tripOwnerId": tripownerid});
+							"tripOwnerId": tripownerid, "userLoc": userLoc});
 					});  
 				    }); 
 			    });
@@ -134,7 +139,7 @@ app.post('/getTransactionInfo', function(req, res) {
 								"tripInfo": tripInfo, "toa": toa, "location": locid, "locName": locName, 
 								"custName": custName, "transStatus": status,
 								"tripOwnerName": tripOwnerName, "tripOwnerEmail": tripOwnerEmail,
-								"tripOwnerId": tripownerid});
+								"tripOwnerId": tripownerid, "userLoc": userLoc});
 						}); 
 					});
 				});
@@ -228,6 +233,7 @@ app.post('/pingUser', function (req, res) {
 	var userid = reqInfo.userid; 
 	var tripid = reqInfo.tripid; 
 	var bagContents = reqInfo.bagContents;
+	var userLoc = reqInfo.userLoc;
 	var senderRef = firebaseRef.child('users/'+userid);
 	var tripRef = firebaseRef.child('trips/'+tripid); 
 	
@@ -250,7 +256,7 @@ app.post('/pingUser', function (req, res) {
 			
 			// initiate a pending transaction
 			var transaction = {'customer': userid, 'tripowner': tripownerid, 'location': locationid, 'trip': tripid, 
-					   'toa': toa, 'bagContents': bagContents, 'status': 'pending'};
+					   'toa': toa, 'bagContents': bagContents, 'userLoc': userLoc, 'status': 'pending'};
 			// update transactions folder with transaction
 			firebaseRef.child('transactions/'+transactionid).set(transaction); 
 
@@ -295,7 +301,6 @@ app.post('/pingUserAccept', function (req, res) {
 		var transInfo = snapshot.val(); 
 		var customerid = transInfo["customer"]; 
 		var tripid = transInfo["trip"];
-		transactionRef.child('status').set("accepted"); 
 		// will have to change the status of all the other pending transations the user may have for the same location!
 		// so that no more than one tripgoer serves the customer's need at that particular store, with his/her partic. bag
 		var customerRef = firebaseRef.child('users/'+customerid);
@@ -335,6 +340,38 @@ app.post('/pingUserAccept', function (req, res) {
 		    }); 
 	    }); 
     }); 
+
+app.post('/pingUserPaid', function (req, res) {
+	var transactionid = req.body.transactionid; 
+	var customerid = req.body.customerid;
+	var custName = req.body.custName; 
+	var tripOwnerid = req.body.tripOwnerId;
+	var locName = req.body.locName; 
+ 
+	var transactionRef = firebaseRef.child('transactions/'+transactionid); 
+	transactionRef.once("value", function(snapshot) { 
+		var transInfo = snapshot.val(); 
+		var tripid = transInfo["trip"];
+		changeTransactionStatus(transactionid, tripid, customerid, tripOwnerid, "paid"); 
+		var tripOwnerRef = firebaseRef.child('users/'+tripOwnerid);
+		tripOwnerRef.once("value", function(snapshot) { 
+			var tripOwnerInfo = snapshot.val(); 
+			var deviceToken = tripOwnerInfo["deviceToken"]; 
+			// create notification and push 
+		      	var note = new apn.Notification();
+			var device = new apn.Device(deviceToken);                    
+			note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+			note.badge = 1;
+			note.sound = "ping.aiff";
+			note.alert =  custName + ' has paid you for your trip to ' + locName + '!';
+			note.payload = {'messageFrom': custName, 'location': locName, 
+					'transactionid': transactionid}; 
+			apnConnection.pushNotification(note, device);
+			res.json({"status": "success"});
+		    }); 
+	    }); 
+    });
+	
 
 app.post('/pingUserReject', function(req, res) { 
 	var reqInfo = req.body;
@@ -536,9 +573,16 @@ app.post('/removeTrip', function(req, res) {
 
 function changeTransactionStatus(transactionid, tripid, customerid, tripownerid, statusType) { 
     firebaseRef.child('transactions/'+transactionid+'/status').set(statusType);
-    firebaseRef.child('trips/'+tripid+'/transactions/'+transactionid).set(statusType); 
     firebaseRef.child('users/'+customerid+'/transactions/requests/'+transactionid).set(statusType); 
     firebaseRef.child('users/'+tripownerid+'/transactions/responses/'+transactionid).set(statusType); 
+    // the trip may have been deleted because of toa, so check to see if it exists first
+    var tripRef = firebaseRef.child('trips/'+tripid);
+    tripRef.once("value", function(snapshot) {
+	    var tripInfo = snapshot.val(); 
+	    if (tripInfo != null) { 
+		tripRef.child('transactions/'+transactionid).set(statusType); 
+	    }
+	});
 }
  
 	
@@ -557,7 +601,7 @@ function removeTransaction(transactionid, tripid, customerid, tripownerid) {
 	}); 
 }
 
-var server = app.listen(3000, function () {
+var server = app.listen(80, function () {
 	
 	var host = server.address().address;
 	var port = server.address().port;

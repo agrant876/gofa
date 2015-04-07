@@ -13,7 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var registered: Bool!
-    let urlstring = "http://localhost:3000/"
+    let urlstring = "http://gofa-app.com"
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
@@ -33,7 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         // if any remote notifications, handle them by configuring Notification Controller
-        var remoteNotif: AnyObject? = launchOptions?[UIApplicationLaunchOptionsRemoteNotificationKey]
+        /*var remoteNotif: AnyObject? = launchOptions?[UIApplicationLaunchOptionsRemoteNotificationKey]
         if (remoteNotif != nil) {
             println("hellllllo")
             let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
@@ -49,7 +49,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         {
             configureViewController()
         }
+*/
     
+        //configureViewController()
+        
         // register remote notifications
         
         // notification actions
@@ -91,12 +94,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         return false
     }
-        
+    
+    /*
     func configureViewController() {
         var vc = self.window!.rootViewController as ViewController
         vc.setupFirebase()
     }
- 
+ */
         
            
     func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
@@ -104,11 +108,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             //do something (maybe alert?)
         } else {
             // app was brought from background to foreground
-            let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+            /*let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
             let notificationVC:NotificationViewController = storyboard.instantiateViewControllerWithIdentifier("notificationVC") as NotificationViewController
             self.window!.rootViewController = notificationVC
             let remoteNotif = userInfo["payload"] as NSDictionary!
-            notificationVC.notification = remoteNotif as NSDictionary
+            notificationVC.notification = remoteNotif
+            */
 
         }
         

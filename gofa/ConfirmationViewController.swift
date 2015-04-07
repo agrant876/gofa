@@ -25,12 +25,14 @@ class ConfirmationViewController: UIViewController, UITextViewDelegate {
     var tripid: String!
     var tripInfo: NSDictionary!
     
-    let urlpinguser = "http://localhost:3000/pingUser"
-    let urlgetbag = "http://localhost:3000/getbag"
-
+    let urlkind = "gofa-app.com"
+    var urlpinguser: String!
+    var urlgetbag: String!
+   
     @IBOutlet weak var locationLabel: UILabel!
     @IBOutlet weak var tripOwnerLabel: UILabel!
     @IBOutlet weak var bagEmptyLabel: UILabel!
+    @IBOutlet weak var addressEmptyLabel: UILabel!
     
     @IBOutlet weak var addressTextView: UITextView!
     @IBOutlet weak var bagContentsTextView: UITextView!
@@ -55,10 +57,11 @@ class ConfirmationViewController: UIViewController, UITextViewDelegate {
     
     @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
         bagContentsTextView.endEditing(true)
+        addressTextView.endEditing(true)
     }
     
-    
-    func textViewDidBeginEditing(bagTextView: UITextView) {
+    func textViewDidBeginEditing(textview: UITextView) {
+        self.addressEmptyLabel.hidden = true
         self.bagEmptyLabel.hidden = true
         self.confirmButton.enabled = true
     }
@@ -79,9 +82,15 @@ class ConfirmationViewController: UIViewController, UITextViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.urlpinguser = "http://" + urlkind + "/pingUser"
+        self.urlgetbag = "http://" + urlkind + "/getbag"
+
         getBag()
         
         bagContentsTextView.delegate = self
+        addressTextView.delegate = self
+        bagContentsTextView.layer.cornerRadius = 8
+        addressTextView.layer.cornerRadius = 8
         confirmButton.layer.borderWidth = 1
         confirmButton.layer.borderColor = UIColor.lightGrayColor().CGColor
         locationName.replaceRange(locationName.startIndex...locationName.startIndex, with: String(locationName[locationName.startIndex]).capitalizedString)
@@ -103,7 +112,7 @@ class ConfirmationViewController: UIViewController, UITextViewDelegate {
     func pingUser(tripid: String!) {
         
         // set up request
-        var requestInfo:NSDictionary = ["userid": self.curUser, "tripid": tripid, "bagContents": self.bagContentsTextView.text]
+        var requestInfo:NSDictionary = ["userid": self.curUser, "tripid": tripid, "bagContents": self.bagContentsTextView.text, "userLoc": self.addressTextView.text]
         //println(NSJSONSerialization.isValidJSONObject(requestInfo))
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)

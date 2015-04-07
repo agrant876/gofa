@@ -15,12 +15,12 @@ class TransactionInfoResponseViewController: UIViewController
     var tripInfo = [String: AnyObject]()
     var status: String! // status of request (pending/deferred, accepted, completed, paid)
     
-    
-    let urlgetbag = "http://localhost:3000/getbag"
-    let urlpinguseraccept = "http://localhost:3000/pingUserAccept"
-    let urlpinguserreject = "http://localhost:3000/pingUserReject"
-    let urlpinguserdelivered = "http://localhost:3000/pingUserDelivered"
-    
+    let urlkind = "gofa-app.com"
+    var urlgetbag: String!
+    var urlpinguseraccept: String!
+    var urlpinguserreject: String!
+    var urlpinguserdelivered: String!
+
     @IBOutlet weak var custNameLabel: UILabel!
     @IBOutlet weak var locationLabel: UILabel!
     @IBOutlet weak var arrivalTimeLabel: UILabel!
@@ -32,6 +32,7 @@ class TransactionInfoResponseViewController: UIViewController
     @IBOutlet weak var toaContextLabel: UILabel!
     @IBOutlet weak var actionButton: OBShapedButton!
     @IBOutlet weak var actionButton2: OBShapedButton!
+    @IBOutlet weak var userLocLabel: UILabel!
     
     @IBAction func selectedAction1(sender: OBShapedButton) {
         if actionType.text == "Accept" {
@@ -58,12 +59,16 @@ class TransactionInfoResponseViewController: UIViewController
         let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
         let transVC:TransactionViewController = storyboard.instantiateViewControllerWithIdentifier("transactions") as TransactionViewController
         transVC.curUser = self.curUser
-        transVC.getTransactions(self.curUser)
         self.presentViewController(transVC, animated: false, completion: nil)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.urlgetbag = "http://" + urlkind + "/getbag"
+        self.urlpinguseraccept = "http://" + urlkind + "/pingUserAccept"
+        self.urlpinguserreject = "http://" + urlkind + "/pingUserReject"
+        self.urlpinguserdelivered = "http://" + urlkind + "/pingUserDelivered"
         //println(transactionInfo)
         /*if let tinfo = self.transactionInfo["tripInfo"] as [String: AnyObject]? {
             self.tripInfo = tinfo //keys: locid, toa, typeoftrip, userid(trip owner)
@@ -73,6 +78,11 @@ class TransactionInfoResponseViewController: UIViewController
     
     func displayResTransactionInfo() {
         self.custNameLabel.text = self.transactionInfo["custName"] as String!
+        var locName = self.transactionInfo["locName"] as String!
+        locName.replaceRange(locName.startIndex...locName.startIndex, with: String(locName[locName.startIndex]).capitalizedString)
+        self.locationLabel.text = locName
+        println(self.transactionInfo["userLoc"])
+        self.userLocLabel.text = self.transactionInfo["userLoc"] as String!
         var toa = transactionInfo["toa"] as Int
         let date = NSDate()
         let timestamp = date.timeIntervalSince1970
@@ -90,7 +100,7 @@ class TransactionInfoResponseViewController: UIViewController
         } else if self.status == "accepted" {
             displayAcceptedResTransaction()
             displayTabHeader(self.status)
-        } else if self.status == "completed" {
+        } else if self.status == "delivered" {
             displayDeliveredResTransaction()
             displayTabHeader(self.status)
         }

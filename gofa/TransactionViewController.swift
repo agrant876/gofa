@@ -17,9 +17,11 @@ class TransactionViewController: UIViewController {
     var resCount = 0
     var transIndex = 0
     
-    let urlgettransactions = "http://localhost:3000/getTransactions"
-    let urlgettransactioninfo = "http://localhost:3000/getTransactionInfo"
-    let urlpinguseraccept = "http://localhost:3000/pingUserAccept"
+    let urlkind = "gofa-app.com"
+    var urlgettransactions: String!
+    var urlgettransactioninfo: String!
+    var urlpinguseraccept: String!
+    
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var noTransactions: UILabel!
@@ -28,7 +30,18 @@ class TransactionViewController: UIViewController {
     @IBOutlet weak var reqTransactionsView: UIView!
     
     func touchTransactionTab(sender: OBShapedButton) {
-        performSegueWithIdentifier("goto_transactioninfo", sender: sender)
+        var transTab = sender as OBShapedButton
+        var transactionInfo = transactions[transTab.tag] as [String: AnyObject]
+        var status = transactionInfo["transStatus"] as String
+        if status == "delivered" {
+            for view in transTab.subviews as [UIView] {
+                if let payButton = view as? UIButton {
+                    performSegueWithIdentifier("goto_pay", sender: payButton)
+                }
+            }
+        } else {
+            performSegueWithIdentifier("goto_transactioninfo", sender: sender)
+        }
     }
 
     func touchTransactionResponseTab(sender: OBShapedButton) {
@@ -127,6 +140,12 @@ class TransactionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.activityIndicator.startAnimating()
+        
+        self.urlgettransactions = "http://" + urlkind + "/getTransactions"
+        self.urlpinguseraccept = "http://" + urlkind + "/pingUserAccept"
+        self.urlgettransactioninfo = "http://" + urlkind + "/getTransactionInfo"
+        
+        getTransactions(self.curUser)
        /* var reqTransactionsView = UIView(frame: CGRectMake(10, 100, 278, 180))
         reqTransactionsView.backgroundColor = UIColor.blueColor()
         reqTransactionsView.center.x = self.view.center.x
@@ -161,16 +180,20 @@ class TransactionViewController: UIViewController {
         self.view.addSubview(transactionTab3)
 */
 
-        //getTransactions(self.curUser)
+        
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
- 
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(true)
     }
     
     // gets the transactions of 'user' from Firebase, and then calls getTransactionInfo() for all the transactions
     func getTransactions(user: String!) {
+        self.urlgettransactions = "http://" + urlkind + "/getTransactions"
         var requestInfo:NSDictionary = ["userid": user]
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
@@ -222,6 +245,7 @@ class TransactionViewController: UIViewController {
     
     // gets transaction info of transactionid, updates these transactions depending on toa and status, and calls displayReqTransactionTab or displayResTransactionTab for all the relevant transactions (that weren't deleted in server code)
     func getTransactionInfo(transactionid: String!, request: Bool) {
+        self.urlgettransactioninfo = "http://" + urlkind + "/getTransactionInfo"
         var requestInfo:NSDictionary = ["transactionid": transactionid]
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
@@ -239,17 +263,24 @@ class TransactionViewController: UIViewController {
                 var status = feedback["status"] as String!
                 if (status == "success") {
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        // present tab with transaction info
-                        if request == true {
-                            self.displayReqTransactionTab(feedback.mutableCopy() as NSMutableDictionary)
-                            self.noTransactions.hidden = true
-                            self.activityIndicator.stopAnimating()
-                            self.activityIndicator.hidden = true
-                        } else {
-                            self.displayResTransactionTab(feedback.mutableCopy() as NSMutableDictionary)
-                            self.noTrips.hidden = true
-                            self.activityIndicator.stopAnimating()
-                            self.activityIndicator.hidden = true
+                        // present tab with transaction info, do not present paid transactions
+                        var transactionInfo = feedback.mutableCopy() as NSMutableDictionary
+                        var status = transactionInfo["transStatus"] as String
+                        if status != "paid" {
+                            if request == true {
+                                self.displayReqTransactionTab(transactionInfo)
+                                self.noTransactions.hidden = true
+                                self.activityIndicator.stopAnimating()
+                                self.activityIndicator.hidden = true
+                            } else {
+                                self.displayResTransactionTab(transactionInfo)
+                                self.noTrips.hidden = true
+                                self.activityIndicator.stopAnimating()
+                                self.activityIndicator.hidden = true
+                            }
+                        } else  {
+                                self.activityIndicator.stopAnimating()
+                                self.activityIndicator.hidden = true
                         }
                     })
                 } else {
@@ -388,12 +419,26 @@ class TransactionViewController: UIViewController {
             self.view.addSubview(transactionTab)
             var statusLabel = UILabel()
             transactionTab.addSubview(statusLabel)
-            statusLabel.text = "Accepted!"
+            statusLabel.text = "Accepted"
             statusLabel.font = UIFont(name: "Futura", size: 11)
             statusLabel.textColor = UIColor.greenColor()
             statusLabel.sizeToFit()
             statusLabel.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
         }
+        if status == "delivered" {
+            var transTab = UIImage(named: "tabgreen")
+            transactionTab.setImage(transTab, forState: UIControlState.Normal)
+            transactionTab.alpha = 0.8
+            self.view.addSubview(transactionTab)
+            var statusLabel = UILabel()
+            transactionTab.addSubview(statusLabel)
+            statusLabel.text = "Delivered"
+            statusLabel.font = UIFont(name: "Futura", size: 11)
+            statusLabel.textColor = UIColor.greenColor()
+            statusLabel.sizeToFit()
+            statusLabel.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
+        }
+        
         transactionTab.addTarget(self, action: "touchTransactionResponseTab:", forControlEvents: UIControlEvents.TouchUpInside)
         var locLabel = UILabel()
         transactionTab.addSubview(locLabel)

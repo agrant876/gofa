@@ -21,10 +21,10 @@ class NotificationViewController: UIViewController {
     var requestInfo: NSDictionary!
     var curUser: String?
     
-    
-    let urlpinguseraccept = "http://localhost:3000/pingUserAccept"
-    let urlgettransinfo = "http://localhost:3000/getTransactionInfo"
-    let urldefertrans = "http://localhost:3000/deferTransaction"
+    let urlkind = "gofa-app.com"
+    var urlpinguseraccept: String!
+    var urlgettransinfo: String!
+    var urldefertrans: String!
     
     @IBOutlet weak var customerName: UIButton!
     @IBAction func viewCustomer(sender: UIButton) {
@@ -118,6 +118,9 @@ class NotificationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.urlpinguseraccept = "http://" + urlkind + "/pingUserAccept"
+        self.urlgettransinfo = "http://" + urlkind + "/getTransactionInfo"
+        self.urldefertrans = "http://" + urlkind + "/deferTransaction"
     }
     
     override func viewDidAppear(animated: Bool) {

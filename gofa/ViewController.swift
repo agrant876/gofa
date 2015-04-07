@@ -18,10 +18,10 @@ class ViewController: UIViewController {
     
     
     // node info 
-    let urlstring = "http://localhost:3000/"
-//    let urlping = "http://gofa-app.com/ping"
-    let urlping = "http://localhost:3000/ping"
-    let urlunseennotif = "http://localhost:3000/unseenNotif"
+    let urlkind = "gofa-app.com"
+    var urlping: String!
+    var urlunseennotif: String!
+   
     var url: NSURL!
     
     // location manager
@@ -136,11 +136,6 @@ class ViewController: UIViewController {
         pingTask.resume()
         
     }
-    
-  
-    
-    
-    //////////////////
 
     
     @IBAction func touchLocButton(sender: OBShapedButton) {
@@ -226,6 +221,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.urlping = "http://" + urlkind + "/ping"
+        self.urlunseennotif = "http://" + urlkind + "/unseenNotif"
+        
         //var myLocationManager = LocationManager.sharedInstance
         //myLocationManager.registerRegions()
 
@@ -259,34 +257,7 @@ class ViewController: UIViewController {
         //if (self.locManager == nil) {
           //  self.initLocationManager()
         //}
-        setupFirebase() //MOVED TO APP DELEGATE
-        self.url = NSURL(string: urlstring)
-        
-        
-        ////// RANDOM TEST /////
-        
-        let devTokenString = "this is fake device token"
-        let devToken = devTokenString.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
-        print(devToken)
-        let req = NSMutableURLRequest(URL: url!)
-        req.HTTPMethod = "POST"
-       // req.setValue(String(devToken.length), forHTTPHeaderField: "Content-Length")
-        req.HTTPBody = devToken!
-        
-        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
-        let session = NSURLSession(configuration: config);
-        
-        let postDevToken = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
-            if (error == nil) {
-                println("Succesfully saved device token")
-            } else {
-                println("Error saving device token")
-            }
-        })
-        
-        postDevToken.resume()
-        
-        ///////////////////
+        setupFirebase()
         updateUI()
         
        
@@ -361,7 +332,6 @@ class ViewController: UIViewController {
                 var newTransVC = TransactionViewController()
                 newTransVC = segue.destinationViewController as TransactionViewController
                 newTransVC.curUser = self.curUser
-                newTransVC.getTransactions(self.curUser)
         }
     }
     
@@ -414,15 +384,18 @@ class ViewController: UIViewController {
         let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
             if (error == nil) {
                 var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
-                //println(feedback)
-                var hasNotif = feedback["hasNotif"] as String!
-                if  hasNotif == "true" {
+                var pendingTransactions = feedback["pendingTrans"] as NSArray
+                if pendingTransactions.count > 0 {
+                    // present transactions view controller
+                    self.performSegueWithIdentifier("goto_transactions", sender:self)
+                } // else do nothing
+               /* if  hasNotif == "true" {
                     self.transaction = feedback["transaction"] as Dictionary!
                     //there are unseen transactions, present notification view controller
                     self.performSegueWithIdentifier("goto_notif", sender:self)
                     //remoteNotif = remoteNotif as NSDictionary!
                     //notificationVC.notification = remoteNotif as NSDictionary
-                }
+                }*/
             } else {
                 println(error)
                 println("nope")

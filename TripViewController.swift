@@ -21,8 +21,8 @@ class TripViewController: UIViewController {
     var curUser: String!
     var curUserName: String!
     
-    let urlposttrip = "http://localhost:3000/postTrip"
-    
+    let urlkind = "gofa-app.com"
+    var urlposttrip: String!
     
     @IBOutlet weak var locationLabelName: UILabel!
     
@@ -120,12 +120,15 @@ class TripViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.urlposttrip = "http://" + urlkind + "/postTrip"
         updateUI()
         // Do any additional setup after loading the view, typically from a nib.
     }
     
     func updateUI() {
-        self.locationLabelName.text = self.locationDict["name"] as? String
+        var locName = self.locationDict["name"] as String
+        locName.replaceRange(locName.startIndex...locName.startIndex, with: String(locName[locName.startIndex]).capitalizedString)
+        self.locationLabelName.text = locName
         self.locationLabelName.sizeToFit()
         self.locationLabelAddress.text = self.locationDict["address"] as? String
         timeTillArrival.text = "0"

@@ -33,10 +33,11 @@ class LocationViewController: UIViewController {
     var buttontrip2 = false
     var buttontrip3 = false
 
-    let urlremovetrip = "http://localhost:3000/removeTrip"
-    let urlgettrips = "http://localhost:3000/getTrips"
-    let urlgettripinfo = "http://localhost:3000/getTripInfo"
-    let urlgetbag = "http://localhost:3000/getbag"
+    let urlkind = "gofa-app.com"
+    var urlremovetrip: String!
+    var urlgettrips: String!
+    var urlgettripinfo: String!
+    var urlgetbag: String!
     
     @IBOutlet weak var user1: UILabel!
     @IBOutlet weak var user2: UILabel!
@@ -150,7 +151,10 @@ class LocationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.urlremovetrip = "http://" + urlkind + "/removeTrip"
+        self.urlgettrips = "http://" + urlkind + "/getTrips"
+        self.urlgettripinfo = "http://" + urlkind + "/getTripInfo"
+        self.urlgetbag = "http://" + urlkind + "/getbag"
         getBagContents()
         getTrips()
     }
@@ -214,13 +218,13 @@ class LocationViewController: UIViewController {
                     self.trips = feedback["trips"] as Array
                     if self.trips.count > 0 {
                         //display trips
-                        self.noTripsLabel.hidden = true
                         dispatch_async(dispatch_get_main_queue(), { () -> Void in
                             self.displayTrips()
                         })
                     } else {
                         //display no trips
                         dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                            self.noTripsLabel.hidden = false
                         })
                     }
                 }
