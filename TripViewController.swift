@@ -77,7 +77,7 @@ class TripViewController: UIViewController {
         var arrivalTime = Int(ceil(timestamp)) + seconds
         
         
-        var requestInfo:NSDictionary = ["userid": self.curUser, "locationid": self.locationid, "toa": arrivalTime, "public": false]
+        var requestInfo:NSDictionary = ["userid": self.curUser, "userName": self.curUserName, "locationid": self.locationid, "locName": self.locationLabelName.text!, "toa": arrivalTime, "public": false]
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
         let url = NSURL(string: urlposttrip)

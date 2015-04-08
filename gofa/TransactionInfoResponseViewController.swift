@@ -126,6 +126,7 @@ class TransactionInfoResponseViewController: UIViewController
     }
     
     func displayDeliveredResTransaction() {
+        getBag()
         self.statusLabel.hidden = false
         self.statusLabel.text = "Delivered"
         self.actionType.hidden = true
@@ -152,7 +153,7 @@ class TransactionInfoResponseViewController: UIViewController
         locLabel.textColor = UIColor.whiteColor()
         locLabel.sizeToFit()
         var tabSize = transactionTab.frame.size
-        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/8), y: tabSize.height/2)
+        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/10), y: tabSize.height/2)
         var nameLabel = UILabel()
         transactionTab.addSubview(nameLabel)
         nameLabel.text = transactionInfo["tripOwnerName"] as String!
@@ -229,7 +230,7 @@ class TransactionInfoResponseViewController: UIViewController
                 if (status == "success") {
                     println("successfully sent acceptance of request to" + (requestInfo["userid"] as String!))
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        self.displayResTransactionInfo()
+                        self.displayAcceptedResTransaction()
                     })
                 }
             } else {

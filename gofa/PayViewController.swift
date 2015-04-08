@@ -83,6 +83,8 @@ class PayViewController: UIViewController
                     println("successfully paid " + (requestInfo["tripOwnerId"] as String!))
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
                         self.payButton.hidden = true
+                        self.payLabel.text = "Paid!"
+                        self.payLabel.textColor = UIColor.greenColor()
                     })
                 }
             } else {

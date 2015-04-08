@@ -17,6 +17,7 @@ class TransactionInfoViewController: UIViewController
     let urlkind = "gofa-app.com"
     var urlsavebag: String!
     var urlgetbag: String!
+    var urlcancelrequest: String!
     
     @IBOutlet weak var userNameLabel: UILabel!
     @IBOutlet weak var openingLineLabel: UILabel!
@@ -43,15 +44,47 @@ class TransactionInfoViewController: UIViewController
     }
     
     @IBAction func cancelTransaction(sender: OBShapedButton) {
+        var transaction = self.transactionInfo
+        var requestInfo:NSDictionary = ["transactionid": transaction["id"] as String!, "userid": self.curUser as String!, "tripOwnerName": transaction["tripOwnerName"] as String!, "locName": transaction["locName"] as String!]
+        var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
+            options:NSJSONWritingOptions.allZeros, error: nil)
+        let url = NSURL(string: urlcancelrequest)
+        let req = NSMutableURLRequest(URL: url!)
+        req.HTTPMethod = "POST"
+        req.HTTPBody = requestData
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: config);
+        let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+            if (error == nil) {
+                var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+                var status = feedback["status"] as String!
+                if (status == "success") {
+                    println("successfully cancelled request")
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        self.backToTransactions()
+                    })
+                }
+            } else {
+                println(error)
+                println("nope")
+            }
+        })
+        
+        serverTask.resume()
     }
     
+    @IBAction func back(sender: UIButton) {
+        backToTransactions()
+    }
     
-    @IBAction func backToTransactions(sender: UIButton) {
+    func backToTransactions() {
         let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
         let transVC:TransactionViewController = storyboard.instantiateViewControllerWithIdentifier("transactions") as TransactionViewController
         transVC.curUser = self.curUser
         self.presentViewController(transVC, animated: false, completion: nil)
     }
+ 
     
     @IBAction func saveBag(sender: UIButton) {
         sender.hidden = true
@@ -93,6 +126,7 @@ class TransactionInfoViewController: UIViewController
         super.viewDidLoad()
         self.urlsavebag = "http://" + urlkind + "/savebag"
         self.urlgetbag = "http://" + urlkind + "/getbag"
+        self.urlcancelrequest = "http://" + urlkind + "/cancelRequest"
         println(transactionInfo)
         displayReqTransactionInfo()
     }
@@ -159,7 +193,8 @@ class TransactionInfoViewController: UIViewController
         locLabel.textColor = UIColor.whiteColor()
         locLabel.sizeToFit()
         var tabSize = transactionTab.frame.size
-        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/8), y: tabSize.height/2)
+        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/10), y: tabSize.height/2)
+        locLabel.textAlignment = NSTextAlignment.Left
         var nameLabel = UILabel()
         transactionTab.addSubview(nameLabel)
         nameLabel.text = transactionInfo["tripOwnerName"] as String!

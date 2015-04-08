@@ -13,8 +13,6 @@ class LocationViewController: UIViewController {
 
     var locationid: String!
     var locationDict = [String: AnyObject]()
-    var locationName: String!
-    var locationAddress:String!
     
     var authData: FAuthData!
     var curUserName: String!
@@ -26,6 +24,7 @@ class LocationViewController: UIViewController {
     var trips = Array<NSDictionary>() //active trips' id's
     var tripInfo = Array<NSDictionary>() //trip dictionaries
     
+    @IBOutlet weak var locationLabel: UILabel!
     @IBOutlet weak var noTripsLabel: UILabel!
     
     // is button displaying trip? anticlockwise
@@ -151,6 +150,10 @@ class LocationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        var locName = self.locationDict["name"] as String!
+        locName.replaceRange(locName.startIndex...locName.startIndex, with: String(locName[locName.startIndex]).capitalizedString)
+        self.locationLabel.text = locName
+   
         self.urlremovetrip = "http://" + urlkind + "/removeTrip"
         self.urlgettrips = "http://" + urlkind + "/getTrips"
         self.urlgettripinfo = "http://" + urlkind + "/getTripInfo"
@@ -173,6 +176,7 @@ class LocationViewController: UIViewController {
     }
     
     func getBagContents() {
+        println(self.locationid)
         var bagInfo = ["userid": self.curUser, "locationid": self.locationid]
         var bagData = NSJSONSerialization.dataWithJSONObject(bagInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)

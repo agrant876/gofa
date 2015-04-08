@@ -88,6 +88,7 @@ class UserViewController: UIViewController {
         if segue.identifier == "goto_homepage" {
             var HomeVC = ViewController()
             HomeVC = segue.destinationViewController as ViewController
+            HomeVC.newSignUp = true
             HomeVC.authData = self.userKey
         }
     }

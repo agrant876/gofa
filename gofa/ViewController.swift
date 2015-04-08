@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     var locationRef: Firebase!
     var myLocRef: Firebase!
     
+    var newSignUp = false // if true, then register for remote notifications
     
     // node info 
     let urlkind = "gofa-app.com"
@@ -33,7 +34,7 @@ class ViewController: UIViewController {
     var rightLocKey: String!
     var rightLocDict = [String: AnyObject]()
     var leftLocKey: String!
-    var leftLocSnap: FDataSnapshot!
+    var leftLocDict = [String: AnyObject]()
     
     // user info
     var authData: FAuthData!
@@ -59,7 +60,6 @@ class ViewController: UIViewController {
     @IBOutlet weak var userName: UIButton!
     
     @IBAction func switchMode(sender: UIButton) {
-        postTripLabel.text = "Where are you going?"
         if tripMode == false {
             modeButton.setTitle("SHOP", forState: .Normal)
             tripMode = true
@@ -71,7 +71,7 @@ class ViewController: UIViewController {
     
     /// VENMO TESTS /////
     
-    
+    /*
     @IBAction func venmoMe(sender: UIButton) {
         Venmo.sharedInstance().sendPaymentTo("aggrant13@gmail.com", amount:4, note: "yup", audience: VENTransactionAudience.Private) { (transaction, success, error) -> Void in
             if (success) {
@@ -81,7 +81,7 @@ class ViewController: UIViewController {
             }
         }
     }
-    
+    */
     
     
     /// NODE TESTS /////
@@ -137,7 +137,7 @@ class ViewController: UIViewController {
         
     }
 
-    
+
     @IBAction func touchLocButton(sender: OBShapedButton) {
         if tripMode == true {
             let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
@@ -152,6 +152,9 @@ class ViewController: UIViewController {
             } else if button.tag == 1 {
                 newTripVC.locationid = self.rightLocKey
                 newTripVC.locationDict = self.rightLocDict
+            } else if button.tag == 2 {
+                newTripVC.locationid = self.leftLocKey
+                newTripVC.locationDict = self.leftLocDict
             }
             self.presentViewController(newTripVC, animated: false, completion: nil)
         } else {
@@ -168,6 +171,9 @@ class ViewController: UIViewController {
             } else if button.tag == 1 {
                 locVC.locationid = self.rightLocKey
                 locVC.locationDict = self.rightLocDict
+            } else if button.tag == 2 {
+                locVC.locationid = self.leftLocKey
+                locVC.locationDict = self.leftLocDict
             }
             self.presentViewController(locVC, animated: false, completion: nil)
         }
@@ -211,6 +217,14 @@ class ViewController: UIViewController {
            // println(self.rightLocSnap)
             //self.rightLoc.text = self.rightLocDict["name"] as? String
         })
+        locationRef = myRootRef.childByAppendingPath("locations/p03")
+        locationRef.observeEventType(.Value, withBlock: {
+            snapshot in
+            self.leftLocKey = snapshot.key
+            self.leftLocDict = snapshot.value as Dictionary!
+            // println(self.rightLocSnap)
+            //self.rightLoc.text = self.rightLocDict["name"] as? String
+        })
     }
     
     
@@ -223,6 +237,8 @@ class ViewController: UIViewController {
         
         self.urlping = "http://" + urlkind + "/ping"
         self.urlunseennotif = "http://" + urlkind + "/unseenNotif"
+        
+        UIApplication.sharedApplication().applicationIconBadgeNumber = 0
         
         //var myLocationManager = LocationManager.sharedInstance
         //myLocationManager.registerRegions()
@@ -344,8 +360,13 @@ class ViewController: UIViewController {
                 // user authenticated with Firebase
                 self.authData = authData
                 self.curUser = authData.uid
-                self.checkForUnseenNotifs(self.curUser)
-                
+                let delegate = UIApplication.sharedApplication().delegate as AppDelegate
+                delegate.curUser = self.curUser
+                if self.curUser != nil {
+                    self.checkForUnseenNotifs(self.curUser)
+                }
+                // register for Remote Notifications, update device token in Firebase for curUser id
+                UIApplication.sharedApplication().registerForRemoteNotifications()
                 // get name of current user
                 var usernameURL = "https://gofa.firebaseio.com/users/" + self.curUser + "/username"
                 var usernameref = Firebase(url: usernameURL)

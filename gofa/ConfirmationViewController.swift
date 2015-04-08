@@ -95,8 +95,7 @@ class ConfirmationViewController: UIViewController, UITextViewDelegate {
         confirmButton.layer.borderColor = UIColor.lightGrayColor().CGColor
         locationName.replaceRange(locationName.startIndex...locationName.startIndex, with: String(locationName[locationName.startIndex]).capitalizedString)
         locationLabel.text = locationName
-        tripOwnerLabel.text = curUserName
-        
+        tripOwnerLabel.text = tripInfo["userName"] as String!
         
         if (bagContents != nil) {
             bagContentsTextView.text = bagContents
@@ -112,7 +111,7 @@ class ConfirmationViewController: UIViewController, UITextViewDelegate {
     func pingUser(tripid: String!) {
         
         // set up request
-        var requestInfo:NSDictionary = ["userid": self.curUser, "tripid": tripid, "bagContents": self.bagContentsTextView.text, "userLoc": self.addressTextView.text]
+        var requestInfo:NSDictionary = ["custid": self.curUser, "custName": self.curUserName, "tripid": tripid, "bagContents": self.bagContentsTextView.text, "userLoc": self.addressTextView.text, "locName": self.locationLabel.text as String!]
         //println(NSJSONSerialization.isValidJSONObject(requestInfo))
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)

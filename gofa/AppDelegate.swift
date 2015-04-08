@@ -13,6 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var registered: Bool!
+    var curUser: String!
     let urlstring = "http://gofa-app.com"
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
@@ -20,36 +21,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // get current user id (from ViewController)
         let vc = self.window!.rootViewController as ViewController
-        let curUser = vc.curUser as String?
+        self.curUser = vc.curUser as String?
         
         // set up venmo
         Venmo.startWithAppId("2324", secret: "qEeM3DxfKZBuqgUKJkGtDc346xMvpCDh", name: "Gofa")
-       /* Venmo.sharedInstance().defaultTransactionMethod = VENTransactionMethod.API
-        */
+        //Venmo.sharedInstance().defaultTransactionMethod = VENTransactionMethod.API
+
         
         // set up location manager
-        var myLocationManager = LocationManager.sharedInstance
+        /*var myLocationManager = LocationManager.sharedInstance
         myLocationManager.registerRegions()
-        
+        */
         
         // if any remote notifications, handle them by configuring Notification Controller
-        /*var remoteNotif: AnyObject? = launchOptions?[UIApplicationLaunchOptionsRemoteNotificationKey]
+        var remoteNotif: AnyObject? = launchOptions?[UIApplicationLaunchOptionsRemoteNotificationKey]
         if (remoteNotif != nil) {
-            println("hellllllo")
-            let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+            application.applicationIconBadgeNumber = 0
+           /* let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
             let notificationVC:NotificationViewController = storyboard.instantiateViewControllerWithIdentifier("notificationVC") as NotificationViewController
             self.window!.rootViewController = notificationVC
             remoteNotif = remoteNotif as NSDictionary!
             notificationVC.notification = remoteNotif as NSDictionary
             if curUser != nil {
                 notificationVC.curUser = curUser!
-            }
-        } else
+            }*/
+        }/* else
         // if NO remote notifications, configure View Controller
         {
             configureViewController()
         }
-*/
+        */
     
         //configureViewController()
         
@@ -82,8 +83,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         var mySettings = UIUserNotificationSettings(forTypes: types, categories: NSSet(array: [notificationCategory]))
         UIApplication.sharedApplication().registerUserNotificationSettings(mySettings)
-        UIApplication.sharedApplication().registerForRemoteNotifications()
-
         
         return true
     }
@@ -104,17 +103,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
            
     func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+        application.applicationIconBadgeNumber = 0
         if (application.applicationState == UIApplicationState.Active) {
             //do something (maybe alert?)
         } else {
             // app was brought from background to foreground
-            /*let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
+            /*
+            let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
             let notificationVC:NotificationViewController = storyboard.instantiateViewControllerWithIdentifier("notificationVC") as NotificationViewController
             self.window!.rootViewController = notificationVC
             let remoteNotif = userInfo["payload"] as NSDictionary!
             notificationVC.notification = remoteNotif
-            */
 
+            */
         }
         
     }
@@ -147,11 +148,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //let devTokenString = NSString(data: devToken, encoding: NSUTF8StringEncoding)
         //println(devTokenString)
         self.registered = true
-      //  self.sendProviderDeviceToken(devToken) // custom method
+        self.sendProviderDeviceToken(devToken) // custom method
     }
     
     func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError err: NSError)
     {
+        println("Error in registration for notifcations")
         NSLog("Error in registration. Error: ", err)
     }
     
@@ -165,17 +167,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     }
     
-    /*func sendProviderDeviceToken(devToken: NSData) {
-        
-        let url = NSURL(string: "http://gofa-app.com/register")
+    func sendProviderDeviceToken(devToken: NSData) {
+        var token = devToken.description.stringByReplacingOccurrencesOfString("<", withString: "").stringByReplacingOccurrencesOfString(">", withString: "").stringByReplacingOccurrencesOfString(" ", withString: "")
+        var requestInfo:NSDictionary = ["deviceToken": token, "userid": self.curUser]
+        var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
+            options:NSJSONWritingOptions.allZeros, error: nil)
+        let url = NSURL(string: "http://gofa-app.com/saveDeviceToken")
         let req = NSMutableURLRequest(URL: url!)
         req.HTTPMethod = "POST"
-        req.setValue(String(devToken.length), forHTTPHeaderField: "Content-Length")
-        req.HTTPBody = devToken
-        
+        //req.setValue(String(devToken.length), forHTTPHeaderField: "Content-Length")
+        req.HTTPBody = requestData
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
         let config = NSURLSessionConfiguration.defaultSessionConfiguration()
         let session = NSURLSession(configuration: config);
-        
         let postDevToken = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
             if (error == nil) {
                 println("Succesfully saved device token")
@@ -185,7 +189,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         })
         
         postDevToken.resume()
-    }*/
+    }
     
 
 }

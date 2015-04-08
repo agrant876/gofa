@@ -21,6 +21,7 @@ class TransactionViewController: UIViewController {
     var urlgettransactions: String!
     var urlgettransactioninfo: String!
     var urlpinguseraccept: String!
+    var urldefertrans: String!
     
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -82,6 +83,7 @@ class TransactionViewController: UIViewController {
     }
 
     @IBAction func backToHome(sender: UIButton) {
+        // tr
         let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
         let VC:ViewController = storyboard.instantiateViewControllerWithIdentifier("home") as ViewController
         self.presentViewController(VC, animated: false, completion: nil)
@@ -144,6 +146,7 @@ class TransactionViewController: UIViewController {
         self.urlgettransactions = "http://" + urlkind + "/getTransactions"
         self.urlpinguseraccept = "http://" + urlkind + "/pingUserAccept"
         self.urlgettransactioninfo = "http://" + urlkind + "/getTransactionInfo"
+        self.urldefertrans = "http://" + urlkind + "/deferTransaction"
         
         getTransactions(self.curUser)
        /* var reqTransactionsView = UIView(frame: CGRectMake(10, 100, 278, 180))
@@ -367,7 +370,7 @@ class TransactionViewController: UIViewController {
         locLabel.font = UIFont(name: "Futura", size: 11)
         locLabel.textColor = UIColor.whiteColor()
         locLabel.sizeToFit()
-        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/8), y: tabSize.height/2)
+        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/10), y: tabSize.height/2)
         var nameLabel = UILabel()
         transactionTab.addSubview(nameLabel)
         nameLabel.text = transactionInfo["tripOwnerName"] as String!
@@ -396,6 +399,9 @@ class TransactionViewController: UIViewController {
         var status = transactionInfo["transStatus"] as String
         if status == "pending" || status == "deferred" {
             println(status)
+            if status == "pending" {
+                deferTransaction(transactionInfo["id"] as String)
+            }
             var transTab = UIImage(named: "tab")
             transactionTab.setImage(transTab, forState: UIControlState.Normal)
             transactionTab.alpha = 0.8
@@ -448,7 +454,7 @@ class TransactionViewController: UIViewController {
         locLabel.font = UIFont(name: "Futura", size: 11)
         locLabel.textColor = UIColor.whiteColor()
         locLabel.sizeToFit()
-        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/8), y: tabSize.height/2)
+        locLabel.center = CGPoint(x: tabSize.width/2 - tabSize.width*(3/10), y: tabSize.height/2)
         var nameLabel = UILabel()
         transactionTab.addSubview(nameLabel)
         nameLabel.text = transactionInfo["custName"] as String!
@@ -461,6 +467,34 @@ class TransactionViewController: UIViewController {
 
 
         resCount = resCount + 1
+    }
+    
+    func deferTransaction(transactionid: String!) {
+        var userid = curUser as String!
+        var reqInfo:NSDictionary = ["transactionid": transactionid, "userid": userid]
+        var reqData = NSJSONSerialization.dataWithJSONObject(reqInfo,
+        options:NSJSONWritingOptions.allZeros, error: nil)
+        let url = NSURL(string: urldefertrans)
+        let req = NSMutableURLRequest(URL: url!)
+        req.HTTPMethod = "POST"
+        req.HTTPBody = reqData
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: config);
+        let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+            if (error == nil) {
+                var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+                var status = feedback["status"] as String!
+                if (status == "success") {
+                println("successfully updated transaction status to deferred")
+                }
+            } else {
+                println(error)
+                println("nope")
+            }
+        })
+    
+        serverTask.resume()
     }
     
 }
