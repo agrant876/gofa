@@ -25,6 +25,7 @@ class TransactionInfoResponseViewController: UIViewController
     @IBOutlet weak var locationLabel: UILabel!
     @IBOutlet weak var arrivalTimeLabel: UILabel!
     @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var willPayLabel: UILabel!
     @IBOutlet weak var actionType: UILabel!
     @IBOutlet weak var actionType2: UILabel!
     @IBOutlet weak var bagContentsTextView: UITextView!
@@ -33,6 +34,26 @@ class TransactionInfoResponseViewController: UIViewController
     @IBOutlet weak var actionButton: OBShapedButton!
     @IBOutlet weak var actionButton2: OBShapedButton!
     @IBOutlet weak var userLocLabel: UILabel!
+    @IBOutlet weak var willPay2Label: UILabel!
+    @IBOutlet weak var chargeLabel: UILabel!
+    @IBOutlet weak var plusLabel: UILabel!
+    @IBOutlet weak var colonLabel: UILabel!
+    @IBOutlet weak var willPayLabel3: UILabel!
+    @IBOutlet weak var bagCost: UITextField!
+    @IBOutlet weak var costOfItemsLabel: UILabel!
+    @IBOutlet weak var totalCostLabel: UILabel!
+    @IBOutlet weak var amountLabel: UILabel!
+    @IBOutlet weak var dollarSignLabel: UILabel!
+    @IBOutlet weak var deliveredLabel: UILabel!
+    
+    
+    @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
+        self.bagCost.endEditing(true)
+        var totalCost = (self.bagCost.text! as NSString).floatValue +
+            (self.willPayLabel3.text! as NSString).floatValue
+        self.totalCostLabel.text = NSString(format: "%.2f", totalCost)
+    }
+    
     
     @IBAction func selectedAction1(sender: OBShapedButton) {
         if actionType.text == "Accept" {
@@ -83,6 +104,7 @@ class TransactionInfoResponseViewController: UIViewController
         self.locationLabel.text = locName
         println(self.transactionInfo["userLoc"])
         self.userLocLabel.text = self.transactionInfo["userLoc"] as String!
+        self.amountLabel.text = "$" + (self.transactionInfo["willPay"] as String!)
         var toa = transactionInfo["toa"] as Int
         let date = NSDate()
         let timestamp = date.timeIntervalSince1970
@@ -94,7 +116,7 @@ class TransactionInfoResponseViewController: UIViewController
         } else {
             self.arrivalTimeLabel.text = "0"
         }
-        if self.status == "pending" {
+        if self.status == "pending" || self.status == "deferred" {
             displayPendingResTransaction()
             displayTabHeader(self.status)
         } else if self.status == "accepted" {
@@ -114,8 +136,20 @@ class TransactionInfoResponseViewController: UIViewController
     
     func displayAcceptedResTransaction() {
         getBag()
-        self.statusLabel.hidden = false
-        self.statusLabel.text = "Accepted"
+        self.statusLabel.hidden = true
+        self.willPayLabel.hidden = true
+        self.chargeLabel.hidden = false
+        self.bagCost.hidden = false
+        self.plusLabel.hidden = false
+        self.colonLabel.hidden = false
+        self.costOfItemsLabel.hidden = false
+        self.totalCostLabel.hidden = false
+        self.willPayLabel3.hidden = false
+        self.dollarSignLabel.hidden = false
+        self.willPayLabel3.text = transactionInfo["willPay"] as? String
+        self.totalCostLabel.text = self.willPayLabel3.text!
+        self.willPayLabel.hidden = true
+        self.amountLabel.hidden = true
         self.actionType.text = "Message"
         self.actionType.sizeToFit()
         self.actionType.textColor = UIColor.whiteColor()
@@ -127,12 +161,13 @@ class TransactionInfoResponseViewController: UIViewController
     
     func displayDeliveredResTransaction() {
         getBag()
-        self.statusLabel.hidden = false
-        self.statusLabel.text = "Delivered"
+        self.statusLabel.hidden = true
+        self.deliveredLabel.hidden = false
         self.actionType.hidden = true
         self.actionType2.hidden = true
         self.actionButton.hidden = true
         self.actionButton2.hidden = true
+        self.bagCost.enabled = false
         self.contextLabel.text = self.custNameLabel.text //hack
         self.custNameLabel.text = "Awaiting payment from"  //hack
     }
@@ -231,6 +266,7 @@ class TransactionInfoResponseViewController: UIViewController
                     println("successfully sent acceptance of request to" + (requestInfo["userid"] as String!))
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
                         self.displayAcceptedResTransaction()
+                        self.statusLabel.text = "Accepted"
                     })
                 }
             } else {
@@ -275,7 +311,7 @@ class TransactionInfoResponseViewController: UIViewController
     
     func delivered() {
         var transaction = self.transactionInfo
-        var requestInfo:NSDictionary = ["transactionid": transaction["id"] as String!, "userid": self.curUser as String!, "tripOwnerName": transaction["tripOwnerName"] as String!, "locName": transaction["locName"] as String!]
+        var requestInfo:NSDictionary = ["transactionid": transaction["id"] as String!, "userid": self.curUser as String!, "tripOwnerName": transaction["tripOwnerName"] as String!, "locName": transaction["locName"] as String!, "itemsCost": self.bagCost.text!, "willPay": self.willPayLabel3.text!, "totalCost": self.totalCostLabel.text!]
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
         let url = NSURL(string: urlpinguserdelivered)

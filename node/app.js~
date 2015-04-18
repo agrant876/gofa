@@ -35,22 +35,31 @@ var myDevice = new apn.Device(token);
 
 app.post('/unseenNotif', function(req, res) { 
 	var userid = req.body.userid;
-	var userRef = firebaseRef.child('users/'+userid); 
+	console.log(userid); 
+	var pendingTrans = []; // array of pending transactions (ids) to return
+	var userRef = firebaseRef.child('users'); 
 	userRef.once("value", function(snapshot) { 
-		var userInfo = snapshot.val(); 	
-	       	var pendingTrans = []; // array of pending transactions (ids) to return
-		if ('transactions' in userInfo) { 
-		    var transactions = userInfo["transactions"];
-		    if('responses' in transactions) { 
-			var respTransactions = transactions["responses"]; 
-			for (key in respTransactions) {
-			    if (respTransactions[key] == 'pending') { 
-				pendingTrans.push(key);
+		var users = snapshot.val(); 
+		if (userid in users) { 
+		    var userRef = firebaseRef.child('users/'+userid); 
+		    userRef.once("value", function(snapshot) { 
+			    var userInfo = snapshot.val(); 	
+			    if ('transactions' in userInfo) { 
+				var transactions = userInfo["transactions"];
+				if('responses' in transactions) { 
+				    var respTransactions = transactions["responses"]; 
+				    for (key in respTransactions) {
+					if (respTransactions[key] == 'pending') { 
+					    pendingTrans.push(key);
+					}
+				    }
+				}
 			    }
-			}
-		    }
+			    res.json({"pendingTrans": pendingTrans}); 
+			});
+		} else { 
+		    res.json({"pendingTrans": pendingTrans}); 
 		}
-		res.json({"pendingTrans": pendingTrans}); 
 	    });
     });
 	
@@ -100,9 +109,12 @@ app.post('/getTransactionInfo', function(req, res) {
 		var locid = transInfo["location"]; 
 		var tripid = transInfo["trip"]; 
 		var userLoc = transInfo["userLoc"];
+		var willPay = transInfo["willPay"]; 
+		var itemsCost = transInfo["itemsCost"]; 
+		var totalCost = transInfo["totalCost"];
 		var tripRef = firebaseRef.child('trips/'+tripid); 
 		var customerRef = firebaseRef.child('users/'+customerid); 
-
+	    
 		var toa = transInfo["toa"];
 		if (toa < currentTime) { 
 		    // tripowner has arrived at location
@@ -120,16 +132,17 @@ app.post('/getTransactionInfo', function(req, res) {
 				customerRef.once("value", function(snapshot) { 
 				    var custInfo = snapshot.val(); 
 				    var custName = custInfo["username"]; 
-				    var tripOwnerRef = firebaseRef.child('users/'+tripownerid); 
+    				    var tripOwnerRef = firebaseRef.child('users/'+tripownerid); 
 				    tripOwnerRef.once("value", function(snapshot) { 
 					    var tripOwnerInfo = snapshot.val(); 
 					    var tripOwnerName = tripOwnerInfo["username"];
 					    var tripOwnerEmail = tripOwnerInfo["email"]; 
 					    res.json({"status": "success", "id": transactionid, 
-							"tripInfo": null, "toa": toa, "location": locid, "locName": locName, 
+							"tripInfo": null, "toa": toa, "location": locid, "locName": locName, "custid": customerid, 
 							"custName": custName, "transStatus": status,
 							"tripOwnerName": tripOwnerName, "tripOwnerEmail": tripOwnerEmail,
-							"tripOwnerId": tripownerid, "userLoc": userLoc});
+							"tripOwnerId": tripownerid, "userLoc": userLoc, "willPay": willPay, "itemsCost": itemsCost, 
+							"totalCost": totalCost});
 					});  
 				    }); 
 			    });
@@ -152,10 +165,11 @@ app.post('/getTransactionInfo', function(req, res) {
 					    tripRef.once("value", function(snapshot) { 
 						    var tripInfo = snapshot.val(); 
 						    res.json({"status": "success", "id": transactionid, 
-								"tripInfo": tripInfo, "toa": toa, "location": locid, "locName": locName, 
+								"tripInfo": tripInfo, "toa": toa, "location": locid, "locName": locName, "custid": customerid,
 								"custName": custName, "transStatus": status,
 								"tripOwnerName": tripOwnerName, "tripOwnerEmail": tripOwnerEmail,
-								"tripOwnerId": tripownerid, "userLoc": userLoc});
+								"tripOwnerId": tripownerid, "userLoc": userLoc, "willPay": willPay, "itemsCost": itemsCost, 
+								"totalCost": totalCost});
 						}); 
 					});
 				});
@@ -253,6 +267,7 @@ app.post('/pingUser', function (req, res) {
 	var bagContents = reqInfo.bagContents;
 	var userLoc = reqInfo.userLoc;
 	var locname = reqInfo.locName; 
+	var willPay = reqInfo.willPay; 
 
 	var senderRef = firebaseRef.child('users/'+custid);
 	var tripRef = firebaseRef.child('trips/'+tripid); 
@@ -275,19 +290,21 @@ app.post('/pingUser', function (req, res) {
 			
 			// initiate a pending transaction
 			var transaction = {'customer': custid, 'tripowner': tripownerid, 'location': locationid, 'trip': tripid, 
-					   'toa': toa, 'bagContents': bagContents, 'userLoc': userLoc, 'status': 'pending'};
+					   'toa': toa, 'bagContents': bagContents, 'userLoc': userLoc, 'willPay': willPay, 'status': 'pending'};
 			// update transactions folder with transaction
 			firebaseRef.child('transactions/'+transactionid).set(transaction); 
 
 			// update customer's bag (in case it was changed during request)
 			var bagid = locationid+'_'+custid;
 			var bagRef = firebaseRef.child('bags/'+bagid);
+			var custBagRef = firebaseRef.child('users/'+custid+'/bags/'+locationid);			
 			bagRef.set({
 				location: locationid, 
 				    user: custid,
 				    contents: bagContents
 				    });
-				
+			custBagRef.set(bagid); 
+			
 			// create notification and push 
 			var note = new apn.Notification();
 			var device = new apn.Device(deviceToken);                    
@@ -364,12 +381,22 @@ app.post('/pingUserPaid', function (req, res) {
 	var custName = req.body.custName; 
 	var tripOwnerid = req.body.tripOwnerId;
 	var locName = req.body.locName; 
- 
+	var tripOwnerName = req.body.tripOwnerName; 
+	var locid = req.body.locid; 
+	var toa = req.body.toa; 
+	var bagContents = req.body.bagContents; 
+	var delivFee = req.body.delivFee; 
+	var itemsCost = req.body.itemsCost; 
+	var totalCost = req.body.totalCost; 
+
 	var transactionRef = firebaseRef.child('transactions/'+transactionid); 
 	transactionRef.once("value", function(snapshot) { 
 		var transInfo = snapshot.val(); 
 		var tripid = transInfo["trip"];
-		changeTransactionStatus(transactionid, tripid, customerid, tripOwnerid, "paid"); 
+		// archive transaction under paidTransactions
+		archiveTransaction(transactionid, customerid, custName, tripOwnerid, tripOwnerName, locid, locName, toa, bagContents, delivFee, itemsCost, totalCost); 
+		// remove transaction from active transactions
+		removeTransaction(transactionid, tripid, tripOwnerid); 
 		var tripOwnerRef = firebaseRef.child('users/'+tripOwnerid);
 		tripOwnerRef.once("value", function(snapshot) { 
 			var tripOwnerInfo = snapshot.val(); 
@@ -389,6 +416,17 @@ app.post('/pingUserPaid', function (req, res) {
 	    }); 
     });
 	
+function archiveTransaction(transactionid, customerid, custName, tripOwnerid, tripOwnerName, locid, locName, toa, bagContents, delivFee, itemsCost, totalCost) { 
+    var paidTransRef = firebaseRef.child('paidTransactions/'+transactionid); 
+    paidTransRef.set({customer: customerid, tripOwner: tripOwnerid, custName: custName, tripOwnerName: tripOwnerName, location: locid, 
+		locName: locName, toa: toa, delivFee: delivFee, itemsCost: itemsCost, totalCost: totalCost}); 
+    var locationRef = firebaseRef.child('locations/'+locid+'/paidTransactions/'+transactionid); 
+    locationRef.set(bagContents); 
+    var custRef = firebaseRef.child('users/'+customerid+'/paidTransactions/requests/'+transactionid); 
+    custRef.set(bagContents); 
+    var tripOwnerRef = firebaseRef.child('users/'+tripOwnerid+'/paidTransactions/responses/'+transactionid); 
+    tripOwnerRef.set(bagContents);     
+}
 
 app.post('/pingUserReject', function(req, res) { 
 	var reqInfo = req.body;
@@ -445,6 +483,8 @@ app.post('/pingUserDelivered', function(req, res) {
 	var tripOwnerName = req.body.tripOwnerName; 
 	var locName = req.body.locName; 
 	var transactionRef = firebaseRef.child('transactions/'+transactionid); 
+	transactionRef.child('itemsCost').set(req.body.itemsCost); 
+	transactionRef.child('totalCost').set(req.body.totalCost);
 	transactionRef.once("value", function(snapshot) { 
 		var transInfo = snapshot.val(); 
 		var customerid = transInfo["customer"];
@@ -486,18 +526,22 @@ app.post('/postTrip', function(req, res) {
 	var locationTripRef = firebaseRef.child('locations/'+locid+'/trips/'+tripid); 
 	locationTripRef.set(toa);
 
-	// send notification to user's friends 
-	var usersRef = firebaseRef.child('users'); 
-	usersRef.once("value", function(snapshot) {
-		var users = snapshot.val(); 
-		for (user in users) { 
-		    if (user != userid) { 
-			console.log(user); 
-			pingUserWithTrip(user, userName, locName); 
+	if (userName != "Andrew G") { 
+	    // send notification to user's friends 
+	    var usersRef = firebaseRef.child('users'); 
+	    usersRef.once("value", function(snapshot) {
+		    var users = snapshot.val(); 
+		    for (user in users) { 
+			if (user != userid) { 
+			    console.log(user); 
+			    pingUserWithTrip(user, userName, locName); 
+			}
 		    }
-		}
-		res.json({"status": "success", "tripid": tripid}); 
-	    });
+		    res.json({"status": "success", "tripid": tripid}); 
+		});
+	} else { 
+	    res.json({"status": "success", "tripid": tripid}); 
+	}
     }); 
 
 function pingUserWithTrip(userid, userName, locName) { 
@@ -505,16 +549,18 @@ function pingUserWithTrip(userid, userName, locName) {
     userRef.once("value", function(snapshot) { 
 	    var userInfo = snapshot.val(); 
 	    var deviceToken = userInfo["deviceToken"];
-	    // create notification and push 
-	    var note = new apn.Notification();
-	    var device = new apn.Device(deviceToken);                    
-	    note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-	    note.badge = 1;
-	    note.sound = "ping.aiff";
-	    note.alert =  userName + ' is going to ' + locName + ' soon!';
-	    note.payload = {'messageFrom': userName, 'location': locName};
-	    note.category = "TRIP_CATEGORY"; 
-	    apnConnection.pushNotification(note, device);
+	    if (deviceToken != null) {
+		// create notification and push 
+		var note = new apn.Notification();
+		var device = new apn.Device(deviceToken);                    
+		note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+		note.badge = 1;
+		note.sound = "ping.aiff";
+		note.alert =  userName + ' is going to ' + locName + ' soon!';
+		note.payload = {'messageFrom': userName, 'location': locName};
+		note.category = "TRIP_CATEGORY"; 
+		apnConnection.pushNotification(note, device);
+	    }
 	});
 }
 
@@ -556,12 +602,19 @@ app.post('/getTripInfo', function(req, res) {
 	tripRef.once("value", function(snapshot) { 
 		var tripInfo = snapshot.val(); 
 		var userid = tripInfo["user"]; 
+		var locid = tripInfo["location"]; 
 		var userRef = firebaseRef.child('users/'+userid); 
 		userRef.once("value", function(snapshot) { 
 			var userInfo = snapshot.val(); 
 			var userName = userInfo["username"]; 
-			tripInfo["userName"] = userName; 
-			res.json({"status": "success", "tripInfo": tripInfo}); 
+			tripInfo["userName"] = userName;
+			var locRef = firebaseRef.child('locations/'+locid); 
+			locRef.once("value", function(snapshot) { 
+				var locInfo = snapshot.val(); 
+				var locName = locInfo["name"];
+				tripInfo["locName"] = locName; 
+				res.json({"status": "success", "tripInfo": tripInfo}); 
+			    });
 		    }); 
 	    }); 
     });
@@ -608,6 +661,77 @@ app.post('/getTransactions', function(req, res) {
 	}); 
     }); 
 
+app.post('/getUserCurTrips', function(req, res) { 
+	var userid = req.body.userid; 
+	var userRef = firebaseRef.child('users/'+userid); 
+	userRef.once("value", function(snapshot) { 
+		var userInfo = snapshot.val(); 
+		// check if any current trips
+		var trips = null; 
+		if ("trips" in userInfo) { 
+		    trips = userInfo["trips"];
+		    res.json({"status": "yes", "trips": trips}); 
+		} else { 
+		    res.json({"status": "no", "trips": null});
+		}
+	    }); 
+    }); 
+
+app.post('/getPaidTransactions', function(req, res) { 
+	var userid = req.body.userid; 
+	var userRef = firebaseRef.child('users/'+userid); 
+	userRef.once("value", function(snapshot) { 
+		var userInfo = snapshot.val(); 
+		// check if any paid transactions (past transactions)
+		var transactions = null; 
+		if ("paidTransactions" in userInfo) { 
+		    transactions = userInfo["paidTransactions"];
+		    if ("requests" in transactions) { 
+			var reqTransactions = transactions["requests"]; 
+			var reqTransactionsRef = userRef.child("paidTransactions/requests"); 
+			reqTransactionsRef.once("value", function(snapshot) { 
+				var reqTransInfo = snapshot.val();
+				if ("responses" in transactions) { 
+				    var resTransactionsRef = userRef.child("paidTransactions/responses"); 
+				    resTransactionsRef.once("value", function(snapshot) { 
+					    var resTransInfo = snapshot.val(); 
+					    // user has requests and responses
+					    res.json({"status": "success", "reqTransactions": reqTransInfo, "resTransactions": resTransInfo}); 
+					}); 
+				} else {
+				    // user only has requests
+				    res.json({"status": "success", "reqTransactions": reqTransInfo, "resTransactions": null}); 
+				}
+			    }); 
+		    } else {
+			// only has transactions for trips initiated by user (responses)
+			var resTransactionsRef = userRef.child("paidTransactions/responses"); 
+			resTransactionsRef.once("value", function(snapshot) { 
+				var resTransInfo = snapshot.val(); 
+				res.json({"status": "success", "reqTransactions": null, "resTransactions": resTransInfo}); 
+			    });
+		    } 
+		} else {
+		    // user has no transactions
+		    res.json({"status": "empty", "reqTransactions": null, "resTransactions": null}); 
+		}
+	    }); 
+    }); 	
+
+app.post('/getPaidTransactionInfo', function(req, res) { 
+	var transactionid = req.body.transactionid; 
+	var paidTransRef = firebaseRef.child('paidTransactions/'+transactionid); 
+	paidTransRef.once("value", function(snapshot) { 
+		var transInfo = snapshot.val(); 
+		var customerid = transInfo["customer"]; 
+		var tripownerid = transInfo["tripOwner"];
+		var locid = transInfo["location"]; 
+		var toa = transInfo["toa"]; 
+		//var bagContents = transInfo["bagContents"];
+		res.json(transInfo); 
+	    });
+    }); 
+
 function removeTrip(tripid) { 
     var tripRef = firebaseRef.child('trips/'+tripid); 
     tripRef.once("value", function(snapshot) { 
@@ -632,11 +756,25 @@ function removeTrip(tripid) {
 	});
 }
 
-app.post('/removeTrip', function(req, res) { 
-	 
+app.post('/getLocLogo', function(req, res) { 
+	var locid = req.locid; 
+	var locLogoRef = firebaseRef.child('locations/'+locid+'/logo'); 
+	locLogoRef.once("value", function(snapshot) { 
+		var logoInfo = snapshot.val(); 
+		res.json(logoInfo); 
+	    }); 
     }); 
 
+app.get('/locations', function (req, res) {
+	var locationsRef = firebaseRef.child('locations'); 
+	locationsRef.once("value", function(snapshot) { 
+		var locations = snapshot.val();
+		res.json(locations);
+	    });
+    });
+
 function changeTransactionStatus(transactionid, tripid, customerid, tripownerid, statusType) { 
+   
     firebaseRef.child('transactions/'+transactionid+'/status').set(statusType);
     firebaseRef.child('users/'+customerid+'/transactions/requests/'+transactionid).set(statusType); 
     firebaseRef.child('users/'+tripownerid+'/transactions/responses/'+transactionid).set(statusType); 

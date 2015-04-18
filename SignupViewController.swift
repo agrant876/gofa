@@ -27,8 +27,7 @@ class SignupViewController: UIViewController {
         var email:NSString = txtEmail.text
         var password:NSString = txtPassword.text
         var confirmPassword:NSString = txtPasswordConfirm.text
-        
-        
+    
         if (password != confirmPassword) {
             println("Error: confirmation password does not match password")
         } else {

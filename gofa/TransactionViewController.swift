@@ -23,12 +23,13 @@ class TransactionViewController: UIViewController {
     var urlpinguseraccept: String!
     var urldefertrans: String!
     
-    
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var noTransactions: UILabel!
     @IBOutlet weak var noTrips: UILabel!
     
     @IBOutlet weak var reqTransactionsView: UIView!
+    @IBOutlet weak var requestsScrollV: UIScrollView!
+    @IBOutlet weak var responseScrollV: UIScrollView!
     
     func touchTransactionTab(sender: OBShapedButton) {
         var transTab = sender as OBShapedButton
@@ -313,9 +314,8 @@ class TransactionViewController: UIViewController {
         transactionTab.tag = self.transIndex
         self.transIndex = self.transIndex + 1
         
-        var yheight = reqCount*50 + 100 // tabs have 5 units between each other
+        var yheight = reqCount*50 + 5 // tabs have 5 units between each other
         transactionTab.frame = CGRectMake(10, CGFloat(yheight), 278, 45)
-        transactionTab.center.x = self.view.center.x
         var tabSize = transactionTab.frame.size
         var status = transactionInfo["transStatus"] as String
         if status == "pending" {
@@ -345,7 +345,7 @@ class TransactionViewController: UIViewController {
             statusLabel.center = CGPoint(x: tabSize.width/2 + tabSize.width*(3/8), y: tabSize.height/2)
         }
         if status == "delivered" {
-            var transTab = UIImage(named: "tabgreen")
+            var transTab = UIImage(named: "taborange")
             transactionTab.setImage(transTab, forState: UIControlState.Normal)
             transactionTab.alpha = 0.8
             self.view.addSubview(transactionTab)
@@ -378,6 +378,11 @@ class TransactionViewController: UIViewController {
         nameLabel.textColor = UIColor.whiteColor()
         nameLabel.sizeToFit()
         nameLabel.center = CGPoint(x: tabSize.width/2, y: tabSize.height/2)
+        self.requestsScrollV.addSubview(transactionTab)
+        var superView = transactionTab.superview!
+        var centerPoint = superView.convertPoint(superView.center, fromView: superView.superview)
+        transactionTab.center.x = centerPoint.x
+        self.requestsScrollV.contentSize = CGSize(width: CGFloat(290), height: CGFloat(yheight + 50))
         activityIndicator.stopAnimating()
         activityIndicator.hidden = true
 
@@ -392,9 +397,8 @@ class TransactionViewController: UIViewController {
         transactionTab.tag = self.transIndex
         self.transIndex = self.transIndex + 1
         
-        var yheight = resCount*50 + 320 // tabs have 5 units between each other
+        var yheight = resCount*50 + 5 // tabs have 5 units between each other
         transactionTab.frame = CGRectMake(10, CGFloat(yheight), 278, 45)
-        transactionTab.center.x = self.view.center.x
         var tabSize = transactionTab.frame.size
         var status = transactionInfo["transStatus"] as String
         if status == "pending" || status == "deferred" {
@@ -462,9 +466,13 @@ class TransactionViewController: UIViewController {
         nameLabel.textColor = UIColor.whiteColor()
         nameLabel.sizeToFit()
         nameLabel.center = CGPoint(x: tabSize.width/2, y: tabSize.height/2)
+        self.responseScrollV.addSubview(transactionTab)
+        var superView = transactionTab.superview!
+        var centerPoint = superView.convertPoint(superView.center, fromView: superView.superview)
+        transactionTab.center.x = centerPoint.x
+        self.responseScrollV.contentSize = CGSize(width: CGFloat(290), height: CGFloat(yheight + 50))
         activityIndicator.stopAnimating()
         activityIndicator.hidden = true
-
 
         resCount = resCount + 1
     }

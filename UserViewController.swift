@@ -44,7 +44,7 @@ class UserViewController: UIViewController {
     @IBAction func firstNameEntered(sender: UITextField) {
         hasFirstName = true
         firstName = firstNameTxt.text
-        if hasLastName == true && hasUserName == true {
+        if hasLastName == true {
             submitButton.backgroundColor = buttonColor
             submitButton.enabled = true
         }
@@ -53,7 +53,7 @@ class UserViewController: UIViewController {
     @IBAction func lastNameEntered(sender: UITextField) {
         hasLastName = true
         lastName = lastNameTxt.text
-        if hasFirstName == true && hasUserName == true {
+        if hasFirstName == true {
             submitButton.backgroundColor = buttonColor
             submitButton.enabled = true
         }
@@ -71,7 +71,7 @@ class UserViewController: UIViewController {
     
     
     @IBAction func submitUserInfo(sender: UIButton){
-        User.updateUserInfo(userKey.uid, userInfo: ["firstname": firstName, "lastname": lastName, "username": userName])
+        User.updateUserInfo(userKey.uid, userInfo: ["firstname": firstName, "lastname": lastName, "username": "David R"])
         // need to display error or success depending on return value
         performSegueWithIdentifier("goto_homepage", sender: self)
    }

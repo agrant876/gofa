@@ -22,13 +22,13 @@ class PayViewController: UIViewController
     @IBOutlet weak var tripOwnerLabel: UILabel!
     @IBOutlet weak var locationLabel: UILabel!
     @IBOutlet weak var bagContentsTextView: UITextView!
-    @IBOutlet weak var feeTextField: UITextField!
     @IBOutlet weak var payButton: OBShapedButton!
     @IBOutlet weak var payLabel: UILabel!
+    @IBOutlet weak var itemsCostLabel: UILabel!
+    @IBOutlet weak var deliveryFeeLabel: UILabel!
+    @IBOutlet weak var totalCostLabel: UILabel!
     
-    @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
-        feeTextField.endEditing(true)
-    }
+ 
     
     @IBAction func backToTransactions(sender: UIButton) {
         let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
@@ -38,8 +38,7 @@ class PayViewController: UIViewController
     }
     
     @IBAction func payVenmo(sender: OBShapedButton) {
-        println(feeTextField.text)
-        var amountToPay = NSNumberFormatter().numberFromString(feeTextField.text)
+        var amountToPay = NSNumberFormatter().numberFromString(self.totalCostLabel.text!)
         println(amountToPay)
            // toInt()! * 100
         var email = transactionInfo["tripOwnerEmail"] as String
@@ -64,7 +63,10 @@ class PayViewController: UIViewController
 
     func successfullyPaid() {
         var transaction = self.transactionInfo
-        var requestInfo:NSDictionary = ["transactionid": transaction["id"] as String!, "customerid": self.curUser as String!, "tripOwnerId": transaction["tripOwnerId"] as String!, "custName": transaction["custName"] as String!, "locName": transaction["locName"] as String!]
+        println("in successfully paid")
+        println(transaction["custid"])
+        println(self.bagContentsTextView.text)
+        var requestInfo:NSDictionary = ["transactionid": transaction["id"] as String!, "tripOwnerId": transaction["tripOwnerId"] as String!, "toa": transaction["toa"] as Int, "customerid": transaction["custid"] as String!, "custName": transaction["custName"] as String!, "tripOwnerName": self.transactionInfo["tripOwnerName"] as String!, "locName": transaction["locName"] as String!, "locid": transaction["location"] as String!, "bagContents": self.bagContentsTextView.text!, "delivFee": self.deliveryFeeLabel.text!, "itemsCost": self.itemsCostLabel.text!, "totalCost": self.totalCostLabel.text!]
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
         let url = NSURL(string: urlpinguserpaid)
@@ -102,6 +104,11 @@ class PayViewController: UIViewController
         self.urlpinguserpaid = "http://" + urlkind + "/pingUserPaid"
         self.tripOwnerLabel.text = self.transactionInfo["tripOwnerName"] as String!
         self.locationLabel.text = self.transactionInfo["locName"] as String!
+        self.totalCostLabel.text = self.transactionInfo["totalCost"] as String!
+        self.deliveryFeeLabel.text = self.transactionInfo["willPay"] as String!
+        self.itemsCostLabel.text = self.transactionInfo["itemsCost"] as String!
+        self.totalCostLabel.layer.cornerRadius = 3
+        self.totalCostLabel.layer.masksToBounds = true
         getBag()
     }
     

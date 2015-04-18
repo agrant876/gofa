@@ -29,14 +29,13 @@ class LoginViewController: UIViewController {
         ref.authUser(email, password: password) {
             error, authData in
             if error != nil {
+                println(error)
                 // an error occured while attempting login
             } else {
                 // user is logged in, check authData for data
                 println("logged in")
                 self.authData = authData
                 self.performSegueWithIdentifier("goto_homepage", sender: self)
-            
-                
             }
         }
     }
@@ -44,7 +43,7 @@ class LoginViewController: UIViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "goto_homepage" {
             var HomeVC = ViewController()
-            println(self.authData.uid)
+            println(self.authData.uid) 
             HomeVC = segue.destinationViewController as ViewController
             HomeVC.authData = self.authData
         }

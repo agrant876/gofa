@@ -10,11 +10,12 @@ import UIKit
 import CoreLocation
 import MapKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITextFieldDelegate {
     
     var myRootRef: Firebase!
     var locationRef: Firebase!
     var myLocRef: Firebase!
+    
     
     var newSignUp = false // if true, then register for remote notifications
     
@@ -22,11 +23,19 @@ class ViewController: UIViewController {
     let urlkind = "gofa-app.com"
     var urlping: String!
     var urlunseennotif: String!
-   
+    var urllocations: String!
+    var urlgetloclogo: String!
+    var urlgettrips: String!
+    var urladdlocation: String!
+    
     var url: NSURL!
     
     // location manager
     var locManager: CLLocationManager!
+    
+    // array of location dictionaries
+    var locations = [NSMutableDictionary]()
+    var locationIndex = 0;
     
     // location info 
     var topLocKey: String!
@@ -35,6 +44,27 @@ class ViewController: UIViewController {
     var rightLocDict = [String: AnyObject]()
     var leftLocKey: String!
     var leftLocDict = [String: AnyObject]()
+    
+    // trip Notif UI elements 
+    var topTripsNotif: UIImageView!
+    var topCountLabel: UILabel!
+    var rightTripsNotif: UIImageView!
+    var rightCountLabel: UILabel!
+    var leftTripsNotif: UIImageView!
+    var leftCountLabel: UILabel!
+    var topNotif = false
+    var leftNotif = false
+    var rightNotif = false
+    
+    // add location UI elements
+    @IBOutlet weak var addLocation: UILabel!
+    @IBOutlet weak var enterLocationTextField: UITextField!
+    @IBOutlet weak var saveLocationButton: UIButton!
+    
+    var topHasLogo: Bool!
+    var leftHasLogo: Bool!
+    var rightHasLogo: Bool!
+    
     
     // user info
     var authData: FAuthData!
@@ -45,19 +75,29 @@ class ViewController: UIViewController {
     // transaction info (for segue to Notification VIew Controller)
     var transaction = [String: AnyObject]()
     
+    
+    @IBOutlet weak var buttonInterface: UIView!
+    
     @IBOutlet weak var testLocationLabel: UILabel!
     
-    
-
-    @IBOutlet weak var topLoc: UILabel!
-    @IBOutlet weak var rightLoc: UILabel!
-    @IBOutlet weak var leftLoc: UILabel!
+    @IBOutlet weak var topButton: OBShapedButton!
+    @IBOutlet weak var leftButton: OBShapedButton!
+    @IBOutlet weak var rightButton: OBShapedButton!
     
     @IBOutlet weak var postTripLabel: UILabel!
     @IBOutlet weak var modeButton: UIButton!
     
     
     @IBOutlet weak var userName: UIButton!
+    
+    func textFieldDidBeginEditing(textField: UITextField) {
+        println("enabling")
+        self.saveLocationButton.enabled = true
+    }
+    
+    @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
+        self.enterLocationTextField.endEditing(true)
+    }
     
     @IBAction func switchMode(sender: UIButton) {
         if tripMode == false {
@@ -67,6 +107,110 @@ class ViewController: UIViewController {
             tripMode = false
             modeButton.setTitle("POST", forState: .Normal)
         }
+    }
+    
+    @IBAction func didPressSave(sender: UIButton) {
+        var requestInfo:NSDictionary = ["locName": self.enterLocationTextField.text]
+        var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
+            options:NSJSONWritingOptions.allZeros, error: nil)
+        let url = NSURL(string: urladdlocation)
+        let req = NSMutableURLRequest(URL: url!)
+        req.HTTPMethod = "POST"
+        req.HTTPBody = requestData
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: config);
+        let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+            if (error == nil) {
+                var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+                var status = feedback["status"] as String!
+                if (status == "success") {
+                    println(feedback)
+                    println("successfully added location")
+                    var locInfo = feedback.mutableCopy() as NSMutableDictionary
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        self.enterLocationTextField.text = ""
+                        if self.leftButton.enabled == false {
+                            self.addNewLocationButton(locInfo, button: "left")
+                        } else {
+                            self.addLocation.hidden = true
+                            self.enterLocationTextField.hidden = true
+                            self.addLocation.hidden = true
+                            self.saveLocationButton.hidden = true
+                            self.addNewLocationButton(locInfo, button: "right")
+                        }
+        
+                        //self.getLocations()
+                    })
+                }
+            } else {
+                println(error)
+                println("nope")
+            }
+        })
+        
+        serverTask.resume()
+    }
+    
+    func addNewLocationButton(newLocInfo: NSMutableDictionary, button: String!) {
+        self.locations.append(newLocInfo)
+        if button == "left" {
+            self.leftButton.enabled = true
+            println(newLocInfo)
+            self.leftLocKey = newLocInfo["id"] as String
+            self.leftLocDict = [String: AnyObject]()
+            self.leftLocDict["name"] = newLocInfo["name"]
+            var ivLeftLocation = UILabel()
+            self.leftButton.addSubview(ivLeftLocation)
+            ivLeftLocation.text = newLocInfo["name"] as String!
+            ivLeftLocation.font = UIFont(name: "Futura", size: 18)
+            ivLeftLocation.textColor = UIColor.whiteColor()
+            ivLeftLocation.sizeToFit()
+            var superView = ivLeftLocation.superview!
+            var centerPoint = superView.convertPoint(superView.center, fromView: superView.superview)
+            centerPoint.y = centerPoint.y - 5
+            ivLeftLocation.center = centerPoint
+        } else {
+            self.rightButton.enabled = true
+            self.rightLocKey = newLocInfo["id"] as String
+            self.rightLocDict = [String: AnyObject]()
+            self.rightLocDict["name"] = newLocInfo["name"]
+            var ivRightLocation = UILabel()
+            self.rightButton.addSubview(ivRightLocation)
+            ivRightLocation.text = newLocInfo["name"] as String!
+            ivRightLocation.font = UIFont(name: "Futura", size: 18)
+            ivRightLocation.textColor = UIColor.whiteColor()
+            ivRightLocation.sizeToFit()
+            var superView = ivRightLocation.superview!
+            var centerPoint = superView.convertPoint(superView.center, fromView: superView.superview)
+            centerPoint.y = centerPoint.y - 5
+            ivRightLocation.center = centerPoint
+        }
+    }
+    
+    @IBAction func showDifferentLocations(sender: UIButton) {
+        // remove current logos on screen
+        var curTopIV = self.topButton.subviews[1] as UIImageView
+        curTopIV.removeFromSuperview()
+        if self.leftButton.enabled == true {
+            if self.leftHasLogo == true {
+                var curLeftIV = self.leftButton.subviews[1] as UIImageView
+                curLeftIV.removeFromSuperview()
+            } else {
+                var curLeftLabel = self.leftButton.subviews[1] as UILabel
+                curLeftLabel.removeFromSuperview()
+            }
+        }
+        if self.rightButton.enabled == true {
+            if self.rightHasLogo == true {
+                var curRightIV = self.rightButton.subviews[1] as UIImageView
+                curRightIV.removeFromSuperview()
+            } else {
+                var curRightLabel = self.rightButton.subviews[1] as UILabel
+                curRightLabel.removeFromSuperview()
+            }
+        }
+        displayNewLogos()
     }
     
     /// VENMO TESTS /////
@@ -97,10 +241,8 @@ class ViewController: UIViewController {
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
        
-        
         println(requestData)
         
-    
         let url = NSURL(string: urlping)
         let req = NSMutableURLRequest(URL: url!)
         req.HTTPMethod = "POST"
@@ -137,7 +279,320 @@ class ViewController: UIViewController {
         
     }
 
+   /* func showLocations() {
+        // location id's
+        var topLoc: String?
+        var leftLoc: String?
+        var rightLoc: String?
+        
+        // load image view information for new locations
+        if (self.locationIndex >= locations.count) {
+            self.locationIndex = 0
+        }
+        topLoc = self.locations[self.locationIndex++]
+        getLocationLogo(topLoc!, buttonPos: "top")
+        if (self.locationIndex < locations.count) {
+            leftLoc = self.locations[self.locationIndex++]
+            getLocationLogo(leftLoc!, buttonPos: "left")
+        }
+        if (self.locationIndex < locations.count) {
+            rightLoc = self.locations[self.locationIndex++]
+            getLocationLogo(rightLoc!, buttonPos: "right")
+        }
+    }
+    
+    func getLocationLogo(locationid: String!, buttonPos: String!) {
+        var requestInfo:NSDictionary = ["locid": locationid]
+        var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
+            options:NSJSONWritingOptions.allZeros, error: nil)
+        let url = NSURL(string: urlgetloclogo)
+        let req = NSMutableURLRequest(URL: url!)
+        req.HTTPMethod = "POST"
+        req.HTTPBody = requestData
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: config);
+        
+        let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+            if (error == nil) {
+                var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+                println(feedback)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    self.displayLogo(feedback, buttonPos: buttonPos)
+                })
+            } else {
+                println(error)
+                println("nope")
+            }
+        })
+        serverTask.resume()
 
+        
+    
+    }
+*/
+    
+    func displayNewLogos() {
+        
+        // location dictionaries
+        var topLoc: NSDictionary
+        var leftLoc: NSDictionary
+        var rightLoc: NSDictionary
+        
+        var topLogoInfo: NSDictionary
+        var leftLogoInfo: NSDictionary
+        var rightLogoInfo: NSDictionary
+
+        self.topLocDict = [String: AnyObject]()
+        self.leftLocDict = [String: AnyObject]()
+        self.rightLocDict = [String: AnyObject]()
+        
+        // load logo information for new locations
+        println(self.locationIndex)
+        println(locations.count)
+        if (self.locationIndex >= locations.count) {
+            self.locationIndex = 0
+        }
+        topLoc = self.locations[self.locationIndex++] as NSDictionary
+        self.topLocKey = topLoc["id"] as String
+        self.topLocDict = topLoc as [String: AnyObject]
+        if let topLogoInfo = topLoc["logo"] as? NSDictionary {
+            // display top(physically) Location
+            var file = topLogoInfo["file"] as String
+            var width = topLogoInfo["width"] as CGFloat
+            var height = topLogoInfo["height"] as CGFloat
+            println(file)
+            var ivTopLocation = UIImageView(frame: CGRectMake(0, 0, width, height))
+            self.topButton.addSubview(ivTopLocation)
+            var iTopView = UIImage(named: file)
+            ivTopLocation.image = iTopView
+            var superView = ivTopLocation.superview!
+            var centerPoint = superView.convertPoint(superView.center, fromView: superView.superview)
+            centerPoint.y = centerPoint.y - 5
+            ivTopLocation.center = centerPoint
+            self.topHasLogo = true
+        } else {
+            var topLocationLabel = UILabel()
+            self.topButton.addSubview(topLocationLabel)
+            topLocationLabel.text = topLoc["name"] as String!
+            topLocationLabel.font = UIFont(name: "Futura", size: 18)
+            topLocationLabel.textColor = UIColor.whiteColor()
+            topLocationLabel.sizeToFit()
+            var superView = topLocationLabel.superview!
+            var centerPoint = superView.convertPoint(superView.center, fromView: superView.superview)
+            centerPoint.y = centerPoint.y - 5
+            topLocationLabel.center = centerPoint
+            self.topHasLogo = false
+        }
+        
+        if (self.locationIndex < locations.count) {
+            // display left Location
+            leftLoc = self.locations[self.locationIndex++] as NSDictionary
+            self.leftLocKey = leftLoc["id"] as String
+            self.leftLocDict = leftLoc as [String: AnyObject]
+            if let leftLogoInfo = leftLoc["logo"] as? NSDictionary {
+                var file = leftLogoInfo["file"] as String
+                var width = leftLogoInfo["width"] as CGFloat
+                var height = leftLogoInfo["height"] as CGFloat
+                var ivLeftLocation = UIImageView(frame: CGRectMake(0, 0, width, height))
+                self.leftButton.addSubview(ivLeftLocation)
+                var iLeftView = UIImage(named: file)
+                ivLeftLocation.image = iLeftView
+                var superView = ivLeftLocation.superview!
+                var centerPoint = superView.convertPoint(superView.center, fromView: superView.superview)
+                centerPoint.y = centerPoint.y - 5
+                ivLeftLocation.center = centerPoint
+                self.leftHasLogo = true
+            } else {
+                var ivLeftLocation = UILabel()
+                self.leftButton.addSubview(ivLeftLocation)
+                ivLeftLocation.text = leftLoc["name"] as String!
+                ivLeftLocation.font = UIFont(name: "Futura", size: 18)
+                ivLeftLocation.textColor = UIColor.whiteColor()
+                ivLeftLocation.sizeToFit()
+                var superView = ivLeftLocation.superview!
+                var centerPoint = superView.convertPoint(superView.center, fromView: superView.superview)
+                centerPoint.y = centerPoint.y - 5
+                ivLeftLocation.center = centerPoint
+                self.leftHasLogo = false
+            }
+            self.leftButton.enabled = true
+        } else {
+            self.leftHasLogo = false
+            self.leftButton.enabled = false
+        }
+        
+        if (self.locationIndex < locations.count) {
+            // display right Location
+            self.addLocation.hidden = true
+            self.enterLocationTextField.hidden = true
+            self.saveLocationButton.hidden = true
+            rightLoc = self.locations[self.locationIndex++] as NSDictionary
+            self.rightLocKey = rightLoc["id"] as String
+            self.rightLocDict = rightLoc as [String: AnyObject]
+            if let rightLogoInfo = rightLoc["logo"] as? NSDictionary {
+                var file = rightLogoInfo["file"] as String
+                var width = rightLogoInfo["width"] as CGFloat
+                var height = rightLogoInfo["height"] as CGFloat
+                var ivRightLocation =  UIImageView(frame: CGRectMake(0, 0, width, height))
+                self.rightButton.addSubview(ivRightLocation)
+                var iRightView = UIImage(named: file)
+                ivRightLocation.image = iRightView
+                var superView = ivRightLocation.superview!
+                var centerPoint = superView.convertPoint(superView.center, fromView: superView.superview)
+                centerPoint.y = centerPoint.y - 5
+                ivRightLocation.center = centerPoint
+                self.rightHasLogo = true
+            } else {
+                var ivRightLocation = UILabel()
+                self.rightButton.addSubview(ivRightLocation)
+                ivRightLocation.text = rightLoc["name"] as String!
+                ivRightLocation.font = UIFont(name: "Futura", size: 18)
+                ivRightLocation.textColor = UIColor.whiteColor()
+                ivRightLocation.sizeToFit()
+                var superView = ivRightLocation.superview!
+                var centerPoint = superView.convertPoint(superView.center, fromView: superView.superview)
+                centerPoint.y = centerPoint.y - 5
+                ivRightLocation.center = centerPoint
+                self.rightHasLogo = false
+            }
+            self.rightButton.enabled = true
+        } else {
+            self.rightHasLogo = false
+            self.rightButton.enabled = false
+            // display Add Location SubView
+            self.addLocation.hidden = false
+            self.enterLocationTextField.hidden = false
+            self.saveLocationButton.hidden = false
+        }
+        
+        // display trips Notif for location
+        displayTripNotifs()
+        
+    }
+
+    func displayTripNotifs() {
+        if self.topNotif == true {
+            self.topNotif = false
+            self.topTripsNotif.removeFromSuperview()
+            self.topCountLabel.removeFromSuperview()
+        }
+        if self.rightNotif == true {
+            self.rightNotif = false
+            self.rightTripsNotif.removeFromSuperview()
+            self.rightCountLabel.removeFromSuperview()
+        }
+        if self.leftNotif == true {
+            self.leftNotif = false
+            self.leftTripsNotif.removeFromSuperview()
+            self.leftCountLabel.removeFromSuperview()
+        }
+        
+        // display top Location's number of trips
+        if let topTrips = self.topLocDict["trips"] as? NSDictionary {
+            // get trips from firebase (ensures that old trips are removed)
+            checkForTrips(self.topLocKey, button: "top")
+        }
+        
+        if let rightTrips = self.rightLocDict["trips"] as? NSDictionary {
+            checkForTrips(self.rightLocKey, button: "right")
+        }
+        
+        if let leftTrips = self.leftLocDict["trips"] as? NSDictionary {
+            checkForTrips(self.leftLocKey, button: "left")
+        }
+    }
+    
+    func displayTripNotifs2(numberOfTrips: Int!, button: String!) {
+        var w = CGFloat(37)
+        var h = CGFloat(33)
+        var notifImage = UIImage(named: "notif")
+        
+        if (button == "top") {
+            self.topNotif = true
+            var topTripsCount = numberOfTrips
+            self.topTripsNotif = UIImageView(frame: CGRectMake(CGFloat(64), CGFloat(14), w, h))
+            self.topTripsNotif.image = notifImage
+            self.buttonInterface.addSubview(self.topTripsNotif)
+            self.topCountLabel = UILabel()
+            self.buttonInterface.addSubview(topCountLabel)
+            self.topCountLabel.text = String(topTripsCount)
+            self.topCountLabel.font = UIFont(name: "Futura", size: 17)
+            self.topCountLabel.textColor = UIColor.whiteColor()
+            self.topCountLabel.sizeToFit()
+            //var superView = topCountLabel.superview!
+            self.topCountLabel.center = self.topTripsNotif.center
+        }
+        
+        // display left Location's number of trips
+        if (button == "left") {
+            self.leftNotif = true
+            var leftTripsCount = numberOfTrips
+            self.leftTripsNotif = UIImageView(frame: CGRectMake(CGFloat(8), CGFloat(93), w, h))
+            leftTripsNotif.image = notifImage
+            self.buttonInterface.addSubview(leftTripsNotif)
+            self.leftCountLabel = UILabel()
+            self.buttonInterface.addSubview(leftCountLabel)
+            leftCountLabel.text = String(leftTripsCount)
+            leftCountLabel.font = UIFont(name: "Futura", size: 17)
+            leftCountLabel.textColor = UIColor.whiteColor()
+            leftCountLabel.sizeToFit()
+            //var superView = topCountLabel.superview!
+            leftCountLabel.center = leftTripsNotif.center
+        }
+        
+        // display right Location's number of trips
+        if (button == "right") {
+            self.rightNotif = true
+            var rightTripsCount = numberOfTrips
+            self.rightTripsNotif = UIImageView(frame: CGRectMake(CGFloat(272), CGFloat(81), w, h))
+            self.rightTripsNotif.image = notifImage
+            self.buttonInterface.addSubview(self.rightTripsNotif)
+            self.rightCountLabel = UILabel()
+            self.buttonInterface.addSubview(rightCountLabel)
+            rightCountLabel.text = String(rightTripsCount)
+            rightCountLabel.font = UIFont(name: "Futura", size: 17)
+            rightCountLabel.textColor = UIColor.whiteColor()
+            rightCountLabel.sizeToFit()
+            //var superView = topCountLabel.superview!
+            rightCountLabel.center = rightTripsNotif.center
+        }
+    }
+    
+    func checkForTrips(locationid: String!, button: String!) {
+        var requestInfo:NSDictionary = ["locationid": locationid]
+        var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
+        options:NSJSONWritingOptions.allZeros, error: nil)
+        let url = NSURL(string: urlgettrips)
+        let req = NSMutableURLRequest(URL: url!)
+        req.HTTPMethod = "POST"
+        req.HTTPBody = requestData
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: config);
+        let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+        if (error == nil) {
+            var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+            var status = feedback["status"] as String!
+            if (status == "success") {
+                println("successfully retrieved trips")
+                var trips = feedback["trips"] as NSArray
+                if trips.count > 0 {
+                    //display trips
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        self.displayTripNotifs2(trips.count, button: button)
+                    })
+                }
+            }
+        } else {
+            println(error)
+            println("nope")
+        }
+        })
+    
+        serverTask.resume()
+    }
+    
     @IBAction func touchLocButton(sender: OBShapedButton) {
         if tripMode == true {
             let storyboard:UIStoryboard = UIStoryboard(name:"Main", bundle:nil)
@@ -147,7 +602,9 @@ class ViewController: UIViewController {
             
             var button = sender as OBShapedButton
             if button.tag == 0 {
+                println(self.topLocKey)
                 newTripVC.locationid = self.topLocKey
+                println(self.topLocDict)
                 newTripVC.locationDict = self.topLocDict
             } else if button.tag == 1 {
                 newTripVC.locationid = self.rightLocKey
@@ -196,8 +653,6 @@ class ViewController: UIViewController {
         performSegueWithIdentifier("goto_login", sender: self)
     }
     
-    
-    
     func setupFirebase() {
         myRootRef = Firebase(url:"https://gofa.firebaseio.com/")
         
@@ -235,9 +690,16 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.enterLocationTextField.delegate = self
+        
         self.urlping = "http://" + urlkind + "/ping"
         self.urlunseennotif = "http://" + urlkind + "/unseenNotif"
-        
+        self.urllocations = "http://" + urlkind + "/locations"
+        self.urlgettrips = "http://" + urlkind + "/getTrips"
+        self.urladdlocation = "http://" + urlkind + "/addLocation"
+        getLocations()
+        //showLocations()
+    
         UIApplication.sharedApplication().applicationIconBadgeNumber = 0
         
         //var myLocationManager = LocationManager.sharedInstance
@@ -273,9 +735,7 @@ class ViewController: UIViewController {
         //if (self.locManager == nil) {
           //  self.initLocationManager()
         //}
-        setupFirebase()
         updateUI()
-        
        
        /* myLocRef = Firebase(url:"https://gofa.firebaseio.com/locations/wawa")
         myLocRef.observeEventType(.Value, withBlock: {
@@ -297,6 +757,8 @@ class ViewController: UIViewController {
        // println(self.curUserName)
     }
     
+
+
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     
         if segue.identifier == "goto_trip" {
@@ -319,7 +781,6 @@ class ViewController: UIViewController {
             newLocVC = segue.destinationViewController as LocationViewController
             newLocVC.authData = self.authData
             newLocVC.curUserName = self.curUserName
-        
             
             var button = sender as OBShapedButton
             if button.tag == 0 {
@@ -349,11 +810,18 @@ class ViewController: UIViewController {
                 newTransVC = segue.destinationViewController as TransactionViewController
                 newTransVC.curUser = self.curUser
         }
+        if segue.identifier == "goto_profile" {
+                var newProfVC = ProfileViewController()
+                newProfVC = segue.destinationViewController as ProfileViewController
+                newProfVC.curUser = self.curUser
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
         //let ref = Firebase(url:"https://gofa.firebaseio.com/")
+        
+        myRootRef = Firebase(url:"https://gofa.firebaseio.com/")
         
         myRootRef.observeAuthEventWithBlock({ authData in
             if authData != nil {
@@ -366,12 +834,16 @@ class ViewController: UIViewController {
                     self.checkForUnseenNotifs(self.curUser)
                 }
                 // register for Remote Notifications, update device token in Firebase for curUser id
-                UIApplication.sharedApplication().registerForRemoteNotifications()
+                //UIApplication.sharedApplication().registerForRemoteNotifications()
+                // for everett's phone
+                var types = UIRemoteNotificationType.Badge | UIRemoteNotificationType.Alert | UIRemoteNotificationType.Sound
+                UIApplication.sharedApplication().registerForRemoteNotificationTypes(types)
                 // get name of current user
                 var usernameURL = "https://gofa.firebaseio.com/users/" + self.curUser + "/username"
                 var usernameref = Firebase(url: usernameURL)
                 usernameref.observeEventType(.Value, withBlock: { snapshot in
                     self.curUserName = snapshot.value as? String
+                    println(self.curUserName)
                     self.userName.setTitle(self.curUserName, forState: .Normal)
                     },
                     withCancelBlock: { error in
@@ -383,9 +855,40 @@ class ViewController: UIViewController {
                 self.performSegueWithIdentifier("goto_login", sender:self)
             }
         })
-        
-        
     }
+    
+    
+    func getLocations() {
+        let url = NSURL(string: urllocations)
+        let req = NSMutableURLRequest(URL: url!)
+        req.HTTPMethod = "GET"
+        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: config);
+        let serverTask = session.dataTaskWithRequest(req, { (data: NSData!, response: NSURLResponse!, error: NSError!) -> Void in
+            if (error == nil) {
+                var feedback: NSDictionary! = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.allZeros, error: nil) as NSDictionary
+                //println(feedback)
+                for (locid, info) in feedback {
+                    var info2 = info as NSDictionary
+                    var locInfo = info2.mutableCopy() as NSMutableDictionary
+                    locInfo["id"] = locid as String
+                    self.locations.append(locInfo)
+                }
+                println(self.locations)
+                println(self.locations.count)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    self.displayNewLogos()
+                })
+            
+            } else {
+                println(error)
+                println("nope")
+            }
+        })
+        serverTask.resume()
+    }
+    
+    
     
     // contacts server to check for any unseened notification, and if there are any, sets the
     // notification controller as the root view controller
@@ -424,6 +927,10 @@ class ViewController: UIViewController {
         })
         serverTask.resume()
     }
+}
+
+
+
 
 
     /*
@@ -515,6 +1022,5 @@ class ViewController: UIViewController {
         //locManager.requestAlwaysAuthorization()
     }
 */
-    
-}
+
 

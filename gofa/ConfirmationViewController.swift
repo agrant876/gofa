@@ -36,6 +36,8 @@ class ConfirmationViewController: UIViewController, UITextViewDelegate {
     
     @IBOutlet weak var addressTextView: UITextView!
     @IBOutlet weak var bagContentsTextView: UITextView!
+    @IBOutlet weak var willPay: UITextField!
+    @IBOutlet weak var slider: UISlider!
     
     @IBOutlet weak var confirmButton: UIButton!
     @IBOutlet weak var confirmed: UILabel!
@@ -58,6 +60,8 @@ class ConfirmationViewController: UIViewController, UITextViewDelegate {
     @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
         bagContentsTextView.endEditing(true)
         addressTextView.endEditing(true)
+        willPay.endEditing(true)
+        slider.value = (willPay.text as NSString).floatValue / 0.05
     }
     
     func textViewDidBeginEditing(textview: UITextView) {
@@ -69,6 +73,14 @@ class ConfirmationViewController: UIViewController, UITextViewDelegate {
     func textViewDidChange(bagTextView: UITextView) {
         self.bagEmptyLabel.hidden = (countElements(self.bagContentsTextView.text) > 0);
     }
+    
+    @IBAction func silderValueChanged(sender: UISlider) {
+        //println(self.slider.value)
+        var newIntValue = Int(self.slider.value)
+        var newFloatValue = Float(newIntValue) * 0.05
+        self.willPay.text = NSString(format: "%.2f", newFloatValue)
+    }
+    
     
     func updateConfirmation(success: Bool) {
         confirmButton.hidden = true
@@ -111,7 +123,7 @@ class ConfirmationViewController: UIViewController, UITextViewDelegate {
     func pingUser(tripid: String!) {
         
         // set up request
-        var requestInfo:NSDictionary = ["custid": self.curUser, "custName": self.curUserName, "tripid": tripid, "bagContents": self.bagContentsTextView.text, "userLoc": self.addressTextView.text, "locName": self.locationLabel.text as String!]
+        var requestInfo:NSDictionary = ["custid": self.curUser, "custName": self.curUserName, "tripid": tripid, "bagContents": self.bagContentsTextView.text, "userLoc": self.addressTextView.text, "locName": self.locationLabel.text as String!, "willPay": self.willPay.text]
         //println(NSJSONSerialization.isValidJSONObject(requestInfo))
         var requestData = NSJSONSerialization.dataWithJSONObject(requestInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)

@@ -17,11 +17,18 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         return _LocationManagerSharedInstance
     }
     
+    var desiredRegion: CLCircularRegion!
+
+    
     var locManager: CLLocationManager!
     var gateRegion: CLCircularRegion!
     var dillsbury2: CLCircularRegion!
     var centerLoc: CLLocation!
     var myRegion: CLCircularRegion!
+    
+    var markedRegions: Array<CLCircularRegion> = []
+    var hitCounts:Array<Int> = []
+    var inRegion: Array<Bool> = []
     
     // register regions nearest to the users current location
     func registerRegions() {
@@ -45,13 +52,60 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         //40.345620, -74.659138
         // spellman
         // 40.345044, -74.659073
-        var latitude:CLLocationDegrees = 40.345044
-        var longitude:CLLocationDegrees = -74.659073
+        // sherrard entrance
+        // 40.349655, -74.652827
+        // corner of friend center
+        // 40.350008, -74.653143
+        // statue intersection
+        // 40.348522, -74.656850
+        // qdoba
+        // 40.350353, -74.657983
+        // small world, nassau 
+        // 40.352426, -74.651150
+        // frist lane
+        // 40.346147, -74.655780
+        // 1903 intersection
+        // 40.346198, -74.656419
+        
+        
+        var latitude:CLLocationDegrees = 40.347404
+        var longitude:CLLocationDegrees = -74.655639
         var center:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude, longitude)
-        var radius:CLLocationDistance = CLLocationDistance(5.0)
-        var identifier:String = "spellman"
-        var overlay = MKCircle(centerCoordinate: center, radius: radius)
-        registerRegionWithCircularOverlay(overlay, identifier: identifier)
+        var radius:CLLocationDistance = CLLocationDistance(30.0)
+        var identifier:String = "Mendell"
+        // Create the geographic region to be monitored.
+        var geoRegion = CLCircularRegion(center: center, radius: radius, identifier: identifier)
+        self.markedRegions.append(geoRegion)
+        self.hitCounts.append(0)
+        self.inRegion.append(false)
+        
+        latitude = 40.346147
+        longitude = -74.655780
+        center = CLLocationCoordinate2DMake(latitude, longitude)
+        radius = CLLocationDistance(15.0)
+        identifier = "Frist Lane"
+        // Create the geographic region to be monitored.
+        geoRegion = CLCircularRegion(center: center, radius: radius, identifier: identifier)
+        self.markedRegions.append(geoRegion)
+        self.hitCounts.append(0)
+        self.inRegion.append(false)
+        
+        latitude = 40.346198
+        longitude = -74.656419
+        center = CLLocationCoordinate2DMake(latitude, longitude)
+        radius = CLLocationDistance(20.0)
+        identifier = "1903 Intersection"
+        // Create the geographic region to be monitored.
+        geoRegion = CLCircularRegion(center: center, radius: radius, identifier: identifier)
+        self.markedRegions.append(geoRegion)
+        self.hitCounts.append(0)
+        self.inRegion.append(false)
+        
+        println(self.markedRegions)
+        
+        locManager.startUpdatingLocation()
+        //var overlay = MKCircle(centerCoordinate: center, radius: radius)
+        //registerRegionWithCircularOverlay(overlay, identifier: identifier)
     }
 
     func registerRegionWithCircularOverlay(overlay: MKCircle, identifier: String) {
@@ -61,24 +115,17 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         if (radius > self.locManager.maximumRegionMonitoringDistance) {
             radius = self.locManager.maximumRegionMonitoringDistance;
         }
-        // Create the geographic region to be monitored.
-        var geoRegion = CLCircularRegion(center: overlay.coordinate, radius: radius, identifier: identifier)
+        
         
         //print(self.locManager)
         //println(geoRegion)
-        geoRegion.notifyOnEntry = true
-        geoRegion.notifyOnExit = true
-        println("---------")
-        println(geoRegion)
-        println(geoRegion.notifyOnEntry)
-        println(geoRegion.notifyOnExit)
-        println("---------")
-        self.centerLoc = CLLocation(latitude: geoRegion.center.latitude, longitude: geoRegion.center.longitude)
-        self.myRegion = geoRegion
+        //geoRegion.notifyOnEntry = true
+        //geoRegion.notifyOnExit = true
+        //self.centerLoc = CLLocation(latitude: geoRegion.center.latitude, longitude: geoRegion.center.longitude)
+        //self.markedRegions.append(geoRegion)
 
-        locManager.startUpdatingLocation()
-        locManager.startMonitoringForRegion(geoRegion)
-        //self.locManager.requestStateForRegion(geoRegion)
+        
+        //locManager.startMonitoringForRegion(geoRegion)
         //var monitoredRegions = self.locManager.monitoredRegions
         /*for region in monitoredRegions {
             var name = (region as CLRegion).identifier
@@ -101,7 +148,13 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         {
             println("all good again")
         }
-        //println(self.locManager.monitoredRegions)
+        var monitoredRegions = self.locManager.monitoredRegions.allObjects as NSArray
+        for region in monitoredRegions {
+            println(region)
+            //region.notifyOnEntry = true
+            //region.notifyOnExit = true
+            println(region.notifyOnExit)
+        }
     }
     
     func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
@@ -128,7 +181,9 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         //var distance = manager.location.distanceFromLocation(fromLoc)
         // println(distance)*/
         if (state == CLRegionState.Inside) {
-            println("I'm in dillon west region")
+            println("I'm in spellman region")
+            var regionInfo = ["region": region.identifier]
+            NSNotificationCenter.defaultCenter().postNotificationName("regionEntered", object: nil, userInfo: regionInfo)
         } else {
             println("keep trying")
         }
@@ -153,14 +208,30 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         let location = locations.last as CLLocation
         //println(location)
-        var dist = location.distanceFromLocation(self.centerLoc)
+        //var dist = location.distanceFromLocation(self.centerLoc)
         //println(location.coordinate.latitude, location.coordinate.longitude)
-        println(dist)
-       /* if self.dillsbury2.containsCoordinate(location.coordinate) {
-            // alert user
-            NSNotificationCenter.defaultCenter().postNotificationName("regionEntered", object: nil)
-        }*/
-      //  self.locManager.requestStateForRegion(myRegion)
+        //println(dist)
+        
+        var index = 0
+        for region in markedRegions {
+            if region.containsCoordinate(location.coordinate) {
+                hitCounts[index] = hitCounts[index] + 1
+                if inRegion[index] == false {
+                    if hitCounts[index] >= 5 {
+                        // alert user (he/she is in desired region)
+                        inRegion[index] = true
+                        var regionInfo = ["region": region.identifier]
+                        NSNotificationCenter.defaultCenter().postNotificationName("regionEntered",  object: nil, userInfo: regionInfo)
+                    }
+                }
+            } else {
+                hitCounts[index] = 0
+                inRegion[index] = false
+            }
+            println(hitCounts[index])
+            index = index + 1
+            
+        }
     }
 
 

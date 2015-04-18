@@ -140,7 +140,7 @@ class TransactionInfoViewController: UIViewController
         // display in minutes and round down
         toa = Int(floor(Double(toa) / 60.0))
         self.arrivalTimeLabel.text = "\(toa)"
-        if self.status == "pending" {
+        if self.status == "pending" || self.status == "deferred" {
             displayPendingReqTransaction()
             displayTabHeader(self.status)
         } else if self.status == "accepted" {
@@ -168,8 +168,6 @@ class TransactionInfoViewController: UIViewController
         self.editBagButton.hidden = true
         self.editBagButton.enabled = false
         self.openingLineLabel.text = "Order accepted by"
-        
-        
     }
     
     func displayCompletedReqTransaction() {

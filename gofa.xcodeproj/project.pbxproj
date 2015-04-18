@@ -31,12 +31,17 @@
 		AD2AADAC1A814AFB00FFA416 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2AADAB1A814AFB00FFA416 /* Trip.swift */; };
 		AD2AADAE1A8155D700FFA416 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2AADAD1A8155D700FFA416 /* Location.swift */; };
 		AD2AADB41A817A3200FFA416 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2AADB31A817A3200FFA416 /* Transaction.swift */; };
+		AD408DC51AD66ABD00F187E7 /* AddressBookViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD408DC41AD66ABD00F187E7 /* AddressBookViewController.swift */; };
+		AD408DC81AD66B2800F187E7 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD408DC61AD66B2800F187E7 /* AddressBook.framework */; };
+		AD408DC91AD66B2800F187E7 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD408DC71AD66B2800F187E7 /* AddressBookUI.framework */; };
 		AD4996A71AA8602600C1BE25 /* TripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4996A61AA8602600C1BE25 /* TripViewController.swift */; };
 		AD4B4C881ACF735D007D929E /* ConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4B4C871ACF735D007D929E /* ConfirmationViewController.swift */; };
 		AD5407231ACB04920067E653 /* TransactionInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5407221ACB04920067E653 /* TransactionInfoViewController.swift */; };
+		AD6DA87B1ADFECCB0076CBA8 /* LocationTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6DA87A1ADFECCB0076CBA8 /* LocationTestViewController.swift */; };
 		AD79693C1AC4560000D0A17B /* TransactionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD79693B1AC4560000D0A17B /* TransactionViewController.swift */; };
 		AD7D8ECD1A81837F008E400D /* UserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7D8ECC1A81837F008E400D /* UserViewController.swift */; };
 		AD863BC81ABCF68F00960AC4 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD863BC71ABCF68F00960AC4 /* LocationManager.swift */; };
+		ADB06B311AD5D03F007B9E49 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB06B301AD5D03F007B9E49 /* ProfileViewController.swift */; };
 		ADB330D41AD1FB0900D77DFA /* TransactionInfoResponseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB330D31AD1FB0900D77DFA /* TransactionInfoResponseViewController.swift */; };
 		ADB954AF1AD232F50008BDDD /* PayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB954AE1AD232F50008BDDD /* PayViewController.swift */; };
 		ADC026221ABA2EDB00B265B1 /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC026211ABA2EDB00B265B1 /* NotificationViewController.swift */; };
@@ -90,12 +95,17 @@
 		AD2AADAB1A814AFB00FFA416 /* Trip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
 		AD2AADAD1A8155D700FFA416 /* Location.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		AD2AADB31A817A3200FFA416 /* Transaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Transaction.swift; path = ../Transaction.swift; sourceTree = "<group>"; };
+		AD408DC41AD66ABD00F187E7 /* AddressBookViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBookViewController.swift; sourceTree = "<group>"; };
+		AD408DC61AD66B2800F187E7 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		AD408DC71AD66B2800F187E7 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		AD4996A61AA8602600C1BE25 /* TripViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TripViewController.swift; path = ../TripViewController.swift; sourceTree = "<group>"; };
 		AD4B4C871ACF735D007D929E /* ConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmationViewController.swift; sourceTree = "<group>"; };
 		AD5407221ACB04920067E653 /* TransactionInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionInfoViewController.swift; sourceTree = "<group>"; };
+		AD6DA87A1ADFECCB0076CBA8 /* LocationTestViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationTestViewController.swift; sourceTree = "<group>"; };
 		AD79693B1AC4560000D0A17B /* TransactionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionViewController.swift; sourceTree = "<group>"; };
 		AD7D8ECC1A81837F008E400D /* UserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserViewController.swift; path = ../UserViewController.swift; sourceTree = "<group>"; };
 		AD863BC71ABCF68F00960AC4 /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		ADB06B301AD5D03F007B9E49 /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		ADB330D31AD1FB0900D77DFA /* TransactionInfoResponseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionInfoResponseViewController.swift; sourceTree = "<group>"; };
 		ADB954AE1AD232F50008BDDD /* PayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayViewController.swift; sourceTree = "<group>"; };
 		ADC026211ABA2EDB00B265B1 /* NotificationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
@@ -112,6 +122,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD408DC81AD66B2800F187E7 /* AddressBook.framework in Frameworks */,
+				AD408DC91AD66B2800F187E7 /* AddressBookUI.framework in Frameworks */,
 				ADD62AC21AC6802500F6EA44 /* CoreLocation.framework in Frameworks */,
 				AD1589D61A7E9EA200DBC68A /* CoreGraphics.framework in Frameworks */,
 				AD1A6E411A7B407E009B9F31 /* UIKit.framework in Frameworks */,
@@ -172,11 +184,14 @@
 			isa = PBXGroup;
 			children = (
 				AD1A6DF11A79D6CF009B9F31 /* Main.storyboard */,
+				ADB06B301AD5D03F007B9E49 /* ProfileViewController.swift */,
+				AD408DC41AD66ABD00F187E7 /* AddressBookViewController.swift */,
 				ADB954AE1AD232F50008BDDD /* PayViewController.swift */,
 				ADB330D31AD1FB0900D77DFA /* TransactionInfoResponseViewController.swift */,
 				AD1A6DED1A79D6CF009B9F31 /* AppDelegate.swift */,
 				AD5407221ACB04920067E653 /* TransactionInfoViewController.swift */,
 				AD27BC561A85950800C02E81 /* LocationViewController.swift */,
+				AD6DA87A1ADFECCB0076CBA8 /* LocationTestViewController.swift */,
 				ADD823681AA7023D009057FB /* ViewController.swift */,
 				AD4B4C871ACF735D007D929E /* ConfirmationViewController.swift */,
 				AD79693B1AC4560000D0A17B /* TransactionViewController.swift */,
@@ -240,6 +255,8 @@
 		F9C32AFC3F27E507CAE57FA5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AD408DC61AD66B2800F187E7 /* AddressBook.framework */,
+				AD408DC71AD66B2800F187E7 /* AddressBookUI.framework */,
 				ADD62AC11AC6802500F6EA44 /* CoreLocation.framework */,
 				1D3B87B69326EAD6C7D01027 /* libPods.a */,
 			);
@@ -387,6 +404,7 @@
 				ADE13BBE1A82B86E004717B6 /* User.swift in Sources */,
 				ADC026221ABA2EDB00B265B1 /* NotificationViewController.swift in Sources */,
 				ADB330D41AD1FB0900D77DFA /* TransactionInfoResponseViewController.swift in Sources */,
+				AD6DA87B1ADFECCB0076CBA8 /* LocationTestViewController.swift in Sources */,
 				AD79693C1AC4560000D0A17B /* TransactionViewController.swift in Sources */,
 				ADC1BAA41A7C472900235B09 /* LoginViewController.swift in Sources */,
 				AD037D611A90984000DA4BA0 /* Bag.swift in Sources */,
@@ -397,8 +415,10 @@
 				AD2AADB41A817A3200FFA416 /* Transaction.swift in Sources */,
 				AD2AADAE1A8155D700FFA416 /* Location.swift in Sources */,
 				AD27BC571A85950800C02E81 /* LocationViewController.swift in Sources */,
+				ADB06B311AD5D03F007B9E49 /* ProfileViewController.swift in Sources */,
 				AD4B4C881ACF735D007D929E /* ConfirmationViewController.swift in Sources */,
 				ADC1BAA81A7C498D00235B09 /* SignupViewController.swift in Sources */,
+				AD408DC51AD66ABD00F187E7 /* AddressBookViewController.swift in Sources */,
 				AD1A6DEE1A79D6CF009B9F31 /* AppDelegate.swift in Sources */,
 				AD1589D41A7E98AE00DBC68A /* UIImage+ColorAtPixel.m in Sources */,
 				ADB954AF1AD232F50008BDDD /* PayViewController.swift in Sources */,

@@ -7,9 +7,10 @@
 //
 
 import UIKit
+import CoreLocation
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate {
 
     var window: UIWindow?
     var registered: Bool!
@@ -29,9 +30,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         
         // set up location manager
-        /*var myLocationManager = LocationManager.sharedInstance
+        var locMan = CLLocationManager()
+        locMan.delegate = self
+        self.startShowingLocationNotifications()
+
+        var myLocationManager = LocationManager.sharedInstance
         myLocationManager.registerRegions()
-        */
         
         // if any remote notifications, handle them by configuring Notification Controller
         var remoteNotif: AnyObject? = launchOptions?[UIApplicationLaunchOptionsRemoteNotificationKey]
@@ -45,7 +49,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if curUser != nil {
                 notificationVC.curUser = curUser!
             }*/
-        }/* else
+        }
+        /* else
         // if NO remote notifications, configure View Controller
         {
             configureViewController()
@@ -58,6 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // notification actions
         
+        /*
         var notificationActionAccept: UIMutableUserNotificationAction = UIMutableUserNotificationAction()
         notificationActionAccept.identifier = "ACCEPT_ID"
         notificationActionAccept.title = "Accept"
@@ -77,12 +83,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         notificationCategory.identifier = "REQUEST_CATEGORY"
         notificationCategory.setActions([notificationActionAccept, notificationActionMoreInfo, notificationActionReject], forContext: UIUserNotificationActionContext.Default)
         notificationCategory.setActions([notificationActionAccept, notificationActionMoreInfo], forContext: UIUserNotificationActionContext.Minimal)
+        */
+       
         
-        var types = UIUserNotificationType.Badge |
-            UIUserNotificationType.Sound | UIUserNotificationType.Alert
         
-        var mySettings = UIUserNotificationSettings(forTypes: types, categories: NSSet(array: [notificationCategory]))
-        UIApplication.sharedApplication().registerUserNotificationSettings(mySettings)
+        // **********************
+        //var types = UIUserNotificationType.Badge |
+        // UIUserNotificationType.Sound | UIUserNotificationType.Alert
+        //var mySettings = UIUserNotificationSettings(forTypes: types, categories: NSSet(array: [notificationCategory])
+        //UIApplication.sharedApplication().registerUserNotificationSettings(mySettings)
+        // **********************
+        
+        
+        // for Everett's Phone
+        var types = UIRemoteNotificationType.Badge | UIRemoteNotificationType.Alert | UIRemoteNotificationType.Sound
+        //UIApplication.sharedApplication().registerForRemoteNotificationTypes(types)
         
         return true
     }
@@ -100,7 +115,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         vc.setupFirebase()
     }
  */
+    
+    
+    //brown: 40.346521 -74.657952
+    func startShowingLocationNotifications() {
+        var locNotification = UILocalNotification()
+        locNotification.regionTriggersOnce = false
         
+        var latitude:CLLocationDegrees = 40.346472
+        var longitude:CLLocationDegrees = -74.660589
+        var center:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude, longitude)
+        var radius:CLLocationDistance = CLLocationDistance(5.0)
+        var identifier:String = "foulkelaughlin"
+        
+        locNotification.region = CLCircularRegion(center: center, radius: radius, identifier: identifier)
+        
+        println(locNotification.region)
+        UIApplication.sharedApplication().scheduleLocalNotification(locNotification)
+        println("SCHEDULING")
+        println(UIApplication.sharedApplication().scheduledLocalNotifications)
+    }
+    
+    
+    func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
+        
+        println("success!!!!!!!!!!")
+        var region = notification.region
+        
+        var regionInfo = ["region": region.identifier]
+        NSNotificationCenter.defaultCenter().postNotificationName("regionEntered", object: nil, userInfo: regionInfo)
+    }
            
     func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
         application.applicationIconBadgeNumber = 0

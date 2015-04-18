@@ -77,7 +77,7 @@ class BagViewController: UIViewController, UITextViewDelegate {
         var bagContents = bagTextView.text;
         var bagInfo = ["contents": bagContents, "userid": self.curUser, "locationid": self.location]
         
-        println(NSJSONSerialization.isValidJSONObject(bagInfo))
+        //println(NSJSONSerialization.isValidJSONObject(bagInfo))
         
         var bagData = NSJSONSerialization.dataWithJSONObject(bagInfo,
             options:NSJSONWritingOptions.allZeros, error: nil)
